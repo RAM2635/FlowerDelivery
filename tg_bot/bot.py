@@ -8,10 +8,10 @@ from os import getenv
 from dotenv import load_dotenv
 from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
-from handlers.register import register_all_handlers
-from tg_bot.handlers.register import register_all_handlers
-from tg_bot.handlers.controls import check_message_validity, add_active_message, remove_inactive_messages, CART_STORAGE
-from keyboards.inline import quantity_keyboard
+from handlers.start import register_handlers
+from handlers.controls import register_handlers as register_controls_handlers, check_message_validity, \
+    add_active_message, remove_inactive_messages, CART_STORAGE
+from keyboards.inline import product_keyboard, cart_keyboard, quantity_keyboard
 from datetime import datetime
 from tg_bot.keyboards.inline import cart_keyboard
 
@@ -27,9 +27,8 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
 # Регистрируем обработчики
-register_all_handlers(dp, bot)
-# register_handlers(dp)
-# register_controls_handlers(dp, bot)
+register_handlers(dp)
+register_controls_handlers(dp, bot)
 
 # Хранилище для отслеживания активных сообщений пользователей
 active_messages = {}

@@ -304,3 +304,14 @@ async def decrease_quantity(callback_query: CallbackQuery):
         await callback_query.answer(f"Ошибка: {str(e)}", show_alert=True)
 
 
+# Регистрация обработчиков
+def register_handlers(dp: Dispatcher, bot: Bot):
+    dp.callback_query.register(partial(show_orders, bot=bot), F.data == "my_orders")
+    dp.callback_query.register(partial(back_to_main, bot=bot), F.data == "main_menu")
+    dp.callback_query.register(increase_quantity, lambda c: c.data.startswith("increase_quantity_"))
+    dp.callback_query.register(decrease_quantity, lambda c: c.data.startswith("decrease_quantity_"))
+    dp.callback_query.register(disabled_callback, F.data == "disabled")
+    dp.callback_query.register(add_to_cart_callback, F.data.startswith("add_to_cart_"))
+    dp.callback_query.register(view_cart, F.data == "view_cart")
+    dp.callback_query.register(remove_item, F.data.startswith("remove_item_"))
+    dp.callback_query.register(confirm_order, F.data == "confirm_order")
