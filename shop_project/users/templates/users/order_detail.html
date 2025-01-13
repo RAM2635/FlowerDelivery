@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Детали заказа{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="text-center">Детали заказа №{{ order.id }}</h1>
+        <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+        <p><strong>Дата создания:</strong> {{ order.date_created|date:"d.m.Y H:i" }}</p>
+        <p><strong>Получатель:</strong> {{ order.recipient_name }}</p>
+        <p><strong>Телефон:</strong> {{ order.phone }}</p>
+        <p><strong>Адрес:</strong> {{ order.address }}</p>
+        <p><strong>Комментарий:</strong> {{ order.comments|default:"Нет" }}</p>
+
+        <h2 class="mt-4">Продукты</h2>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Количество</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.quantity }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Кнопка "Повторить заказ" -->
+        <div class="text-center mt-4">
+            <a href="{% url 'repeat_order' order.id %}" class="btn btn-success btn-lg">Повторить заказ</a>
+        </div>
+    </div>
+{% endblock %}

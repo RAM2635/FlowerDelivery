@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог цветов{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center">Каталог цветов</h1>
+        <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description }}</p>
+                            <p class="card-text"><strong>Цена:</strong> {{ product.price }} ₽</p>
+                            <p class="card-text"><strong>Категория:</strong> {{ product.category }}</p>
+                            <a href="{% url 'product_detail' product.id %}" class="btn btn-info">
+                                <i class="fas fa-info-circle"></i> Подробнее
+                            </a>
+                            <a href="{% url 'cart_add' product.id %}" class="btn btn-primary">
+                                <i class="fas fa-cart-plus"></i> Добавить в корзину
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">Каталог пока пуст.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

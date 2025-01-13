@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Отчёт по заказам</h1>
+
+    <!-- Навигация -->
+    <nav class="mb-4">
+        <a href="{% url 'status_distribution' %}">Распределение заказов по статусам</a> |
+        <a href="{% url 'user_distribution' %}">Распределение заказов по пользователям</a> |
+        <a href="{% url 'average_completion_time' %}">Среднее время выполнения</a> |
+        <a href="{% url 'popular_products' %}">Популярные продукты</a> |
+        <a href="{% url 'orders_by_date' %}">Распределение заказов по датам</a>
+    </nav>
+
+    <!-- Таблица -->
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead style="background-color: #f2f2f2;">
+        <tr>
+            <th style="padding: 8px; text-align: left;">ID</th>
+            <th style="padding: 8px; text-align: left;">Пользователь</th>
+            <th style="padding: 8px; text-align: left;">Статус</th>
+            <th style="padding: 8px; text-align: left;">Дата создания</th>
+            <th style="padding: 8px; text-align: left;">Имя получателя</th>
+            <th style="padding: 8px; text-align: left;">Телефон</th>
+            <th style="padding: 8px; text-align: left;">Адрес</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">{{ order.ID }}</td>
+                <td style="padding: 8px;">{{ order.User }}</td>
+                <td style="padding: 8px;">{{ order.Status }}</td>
+                <td style="padding: 8px;">{{ order.Date_Created }}</td>
+                <td style="padding: 8px;">{{ order.Recipient_Name }}</td>
+                <td style="padding: 8px;">{{ order.Phone }}</td>
+                <td style="padding: 8px;">{{ order.Address }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7" style="padding: 8px; text-align: center;">Нет данных для отображения</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

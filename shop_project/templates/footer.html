@@ -1,0 +1,9 @@
+<footer class="bg-light text-center mt-auto py-3">
+    <div class="container">
+        <p class="mb-0">&copy; {{ year|default:2024 }} Магазин цветов. Все права защищены.</p>
+        <p>Свяжитесь с нами: <a href="mailto:flowershop@example.com">flowershop@example.com</a></p>
+        {% if user.is_superuser %}
+            <p><a href="{% url 'analytics_home' %}" class="btn btn-link">Посмотреть аналитику</a></p>
+        {% endif %}
+    </div>
+</footer>

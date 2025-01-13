@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Распределение заказов по датам</h1>
+    <nav>
+        <a href="{% url 'status_distribution' %}">Распределение заказов по статусам</a> |
+        <a href="{% url 'user_distribution' %}">Распределение заказов по пользователям</a> |
+        <a href="{% url 'average_completion_time' %}">Среднее время выполнения</a> |
+        <a href="{% url 'popular_products' %}">Популярные продукты</a> |
+        <a href="{% url 'orders_by_date' %}">Распределение заказов по датам</a>
+    </nav>
+
+    <!-- Форма для выбора периода -->
+    <form method="get" action="{% url 'orders_by_date' %}">
+        <div>
+            <label for="start_date">Начальная дата:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ request.GET.start_date }}">
+        </div>
+        <div>
+            <label for="end_date">Конечная дата:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ request.GET.end_date }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+    </form>
+
+    <!-- Таблица с результатами -->
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Дата</th>
+            <th>Количество заказов</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for date, count in distribution.items %}
+            <tr>
+                <td>{{ date }}</td>
+                <td>{{ count }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">Нет данных для отображения</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Отзывы о продукте{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="text-center">Отзывы на "{{ product.name }}"</h1>
+        {% if reviews %}
+            <ul class="list-group mt-4">
+                {% for review in reviews %}
+                    <li class="list-group-item">
+                        <strong>{{ review.user.username }}</strong> - {{ review.rating }}/5
+                        <p>{{ review.comment }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center mt-4">Отзывов пока нет. Будьте первым!</p>
+        {% endif %}
+    </div>
+{% endblock %}

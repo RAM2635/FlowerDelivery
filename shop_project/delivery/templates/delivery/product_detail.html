@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        <p><strong>Цена:</strong> {{ product.price }} ₽</p>
+        <p><strong>Количество в наличии:</strong> {{ product.quantity }}</p>
+
+        <h2 class="mt-4">Отзывы</h2>
+        {% if reviews %}
+            <ul class="list-group mt-4">
+                {% for review in reviews %}
+                    <li class="list-group-item">
+                        <strong>{{ review.user.username }}</strong> - {{ review.rating }}/5
+                        <p>{{ review.comment }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Отзывов пока нет. Будьте первым!</p>
+        {% endif %}
+        <a href="{% url 'add_review' product.id %}" class="btn btn-primary mt-3">
+            <i class="fas fa-comment-alt"></i> Добавить отзыв
+        </a>
+
+    </div>
+{% endblock %}

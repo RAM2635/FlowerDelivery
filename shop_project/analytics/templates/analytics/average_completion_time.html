@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Среднее время выполнения заказов</h1>
+    <nav>
+        <a href="{% url 'status_distribution' %}">Распределение заказов по статусам</a> |
+        <a href="{% url 'user_distribution' %}">Распределение заказов по пользователям</a> |
+        <a href="{% url 'average_completion_time' %}">Среднее время выполнения</a> |
+        <a href="{% url 'popular_products' %}">Популярные продукты</a> |
+        <a href="{% url 'orders_by_date' %}">Распределение заказов по датам</a>
+    </nav>
+
+    <p>Среднее время выполнения заказов (в секундах): <strong>{{ average_time|floatformat:2 }}</strong></p>
+{% endblock %}

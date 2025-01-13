@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Популярные продукты</h1>
+    <nav>
+        <a href="{% url 'status_distribution' %}">Распределение заказов по статусам</a> |
+        <a href="{% url 'user_distribution' %}">Распределение заказов по пользователям</a> |
+        <a href="{% url 'average_completion_time' %}">Среднее время выполнения</a> |
+        <a href="{% url 'popular_products' %}">Популярные продукты</a> |
+        <a href="{% url 'orders_by_date' %}">Распределение заказов по датам</a>
+    </nav>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Категория</th>
+            <th>Количество заказов</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for category, count in distribution.items %}
+            <tr>
+                <td>{{ category }}</td>
+                <td>{{ count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

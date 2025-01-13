@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="text-center">Личный кабинет</h1>
+        <h2 class="mt-5">История заказов</h2>
+        {% if orders %}
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID заказа</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
+                    <th>Детали</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.date_created|date:"d.m.Y H:i" }}</td>
+                        <td>{{ order.get_status_display }}</td> <!-- Здесь используется get_status_display -->
+                        <td><a href="{% url 'order_detail' order.id %}" class="btn btn-primary">Подробнее</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <p class="text-center mt-5">Вы пока не сделали ни одного заказа.</p>
+        {% endif %}
+    </div>
+{% endblock %}

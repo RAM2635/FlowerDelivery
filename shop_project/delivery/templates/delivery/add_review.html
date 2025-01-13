@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить отзыв{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="text-center">Добавить отзыв на "{{ product.name }}"</h1>
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="rating" class="form-label">Оценка (от 1 до 5)</label>
+                <select id="rating" name="rating" class="form-select" required>
+                    {% for i in "12345" %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="comment" class="form-label">Комментарий</label>
+                <textarea id="comment" name="comment" class="form-control" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    </div>
+{% endblock %}

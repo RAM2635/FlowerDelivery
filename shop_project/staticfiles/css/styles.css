@@ -1,0 +1,126 @@
+/* Основные стили для сайта */
+body {
+    background: linear-gradient(to bottom, #fef9f9, #f4f0f0);
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Заголовки */
+h1, h2, h3 {
+    color: #8b0000;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Карточки каталога */
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-img-top {
+    height: 400px;
+    object-fit: cover;
+}
+
+.card-body {
+    text-align: center;
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #8b0000;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.btn-info {
+    background-color: #8b0000;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.btn-info:hover {
+    background-color: #5a0000;
+}
+
+/* Отзывы */
+.list-group-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Подвал */
+footer {
+    background-color: #8b0000;
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: auto;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 250px; /* Меньшая высота изображений на мобильных устройствах */
+    }
+
+    .card-title {
+        font-size: 1rem; /* Меньший шрифт заголовков на мобильных */
+    }
+
+    .card-text {
+        font-size: 0.9rem; /* Меньший шрифт описания на мобильных */
+    }
+
+    body {
+        font-size: 16px; /* Уменьшаем общий размер текста */
+    }
+}
+
+#loader {
+    display: none; /* Скрыт по умолчанию */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner-border {
+    width: 4rem;
+    height: 4rem;
+}
+
+.carousel {
+    margin-bottom: 2rem;
+}
+.carousel-inner img {
+    height: 500px;
+    object-fit: cover;
+}

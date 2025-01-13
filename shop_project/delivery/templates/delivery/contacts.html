@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Контакты{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="text-center">Контакты</h1>
+        <p class="lead text-center">Свяжитесь с нами для любых вопросов или предложений!</p>
+
+        <div class="row my-5">
+            <div class="col-md-6">
+                <h2>Наши контакты</h2>
+                <p><strong>Телефон:</strong> +7 (495) 123-45-67</p>
+                <p><strong>Email:</strong> <a href="mailto:flowershop@example.com">flowershop@example.com</a></p>
+                <p><strong>Адрес:</strong> Москва, ул. Цветочная, д. 1</p>
+            </div>
+            <div class="col-md-6">
+                <h2>Форма обратной связи</h2>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Ваше имя</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Ваш email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Сообщение</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

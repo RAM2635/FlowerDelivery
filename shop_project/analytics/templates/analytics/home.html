@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1>Добро пожаловать в раздел аналитики</h1>
+        <p>Вы можете просмотреть отчёты по заказам или другие данные аналитики.</p>
+        <a href="{% url 'orders_report' %}" class="btn btn-primary">Перейти к отчёту по заказам</a>
+    </div>
+{% endblock %}

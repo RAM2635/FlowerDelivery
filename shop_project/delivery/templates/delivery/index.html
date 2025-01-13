@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Главная страница
+{% endblock %}
+
+{% block content %}
+    <!-- Карусель -->
+    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'images/slide4.jpg' %}" class="d-block w-100" alt="Первый слайд">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/slide5.jpg' %}" class="d-block w-100" alt="Второй слайд">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/slide6.jpg' %}" class="d-block w-100" alt="Третий слайд">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Предыдущий</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Следующий</span>
+        </button>
+    </div>
+
+    <!-- Добро пожаловать -->
+    <div class="container text-center my-5">
+        <h1 class="display-4">Добро пожаловать в магазин цветов</h1>
+        <p class="lead">Здесь вы можете выбрать и заказать цветы на любой вкус.</p>
+        <a href="{% url 'product_catalog' %}" class="btn btn-primary btn-lg mt-3">Перейти в каталог</a>
+    </div>
+
+    <!-- Акционные предложения -->
+    <div class="container mt-5">
+        <h2 class="text-center">Наши акционные предложения</h2>
+        <div class="row g-3 mt-4">
+            <!-- Карточка товара 1 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100">
+                    <img src="/media/products/1.jpg" class="card-img-top" alt="Розы">
+                    <div class="card-body">
+                        <h5 class="card-title">Розы</h5>
+                        <p class="card-text">Красивые розы по специальной цене!</p>
+                        <a href="{% url 'product_catalog' %}" class="btn btn-outline-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Карточка товара 2 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100">
+                    <img src="/media/products/2.jpg" class="card-img-top" alt="Тюльпаны">
+                    <div class="card-body">
+                        <h5 class="card-title">Тюльпаны</h5>
+                        <p class="card-text">Яркие тюльпаны для вашего настроения!</p>
+                        <a href="{% url 'product_catalog' %}" class="btn btn-outline-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Карточка товара 3 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100">
+                    <img src="/media/products/3.jpg" class="card-img-top" alt="Хризантемы">
+                    <div class="card-body">
+                        <h5 class="card-title">Хризантемы</h5>
+                        <p class="card-text">Хризантемы для особых случаев!</p>
+                        <a href="{% url 'product_catalog' %}" class="btn btn-outline-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
