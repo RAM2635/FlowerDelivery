@@ -7,8 +7,10 @@ import sqlite3
 from aiogram import Bot, types
 from functools import partial
 from dotenv import load_dotenv
-
+from tg_bot.keyboards.inline import back_button_keyboard
 from tg_bot.keyboards.inline import quantity_keyboard
+from tg_bot.keyboards.inline import main_menu_keyboard
+from tg_bot.keyboards.inline import cart_actions_keyboard
 
 # Локальное хранилище корзин пользователей
 CART_STORAGE = {}
@@ -40,10 +42,7 @@ async def show_orders(callback_query: types.CallbackQuery, bot: Bot):
     else:
         text = "У вас пока нет заказов."
 
-    keyboard = InlineKeyboardBuilder().row(
-        InlineKeyboardButton(text="Назад", callback_data="main_menu")
-    )
-    await callback_query.message.edit_text(text, reply_markup=keyboard.as_markup())
+    await callback_query.message.edit_text(text, reply_markup=back_button_keyboard())
 
 
 # Локальное хранилище сообщений с кнопками
@@ -82,14 +81,10 @@ async def back_to_main(callback_query: CallbackQuery, bot: Bot):
 
         active_messages[user_id] = updated_messages
 
-    keyboard = InlineKeyboardBuilder().row(
-        InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-        InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-    )
     new_message = await bot.send_message(
         chat_id=user_id,
         text="Добро пожаловать в магазин!",
-        reply_markup=keyboard.as_markup()
+        reply_markup=main_menu_keyboard()
     )
 
     add_active_message(user_id, new_message.message_id)
@@ -161,48 +156,40 @@ async def view_cart(callback_query: types.CallbackQuery):
 
     # Если корзина пуста
     if not cart:
-        new_message = await callback_query.message.answer(
-            "Ваша корзина пуста.",
-            reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="main_menu")]]
+        try:
+            new_message = await callback_query.message.answer(
+                "Ваша корзина пуста.",
+                reply_markup=cart_actions_keyboard()
             )
-        )
-        # Добавляем сообщение в active_messages
-        if user_id not in active_messages:
-            active_messages[user_id] = []
-        active_messages[user_id].append(new_message.message_id)
+            # Добавляем сообщение в active_messages
+            if user_id not in active_messages:
+                active_messages[user_id] = []
+            active_messages[user_id].append(new_message.message_id)
+        except Exception as e:
+            await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
         return
 
     # Формируем текст корзины
     text = "Содержимое вашей корзины:\n\n"
     total = 0
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
 
     for item in cart:
         text += f"- {item['product_name']} (x{item['quantity']}) - {item['quantity'] * item['price']} руб.\n"
         total += item['quantity'] * item['price']
 
-        keyboard.inline_keyboard.append([
-            InlineKeyboardButton(text=f"Удалить {item['product_name']}",
-                                 callback_data=f"remove_item_{item['product_id']}")
-        ])
-
     text += f"\nОбщая сумма: {total} руб."
 
-    keyboard.inline_keyboard.append([
-        InlineKeyboardButton(text="Подтвердить заказ", callback_data="start_delivery_process"),
-        InlineKeyboardButton(text="Назад", callback_data="main_menu")
-    ])
-
-    # Отправляем новое сообщение с корзиной
+    # Используем новую функцию для создания клавиатуры
     try:
-        new_message = await callback_query.message.answer(text, reply_markup=keyboard)
-        # Добавляем сообщение в active_messages
+        new_message = await callback_query.message.answer(
+            text, reply_markup=cart_actions_keyboard(cart)
+        )
         if user_id not in active_messages:
             active_messages[user_id] = []
         active_messages[user_id].append(new_message.message_id)
     except Exception as e:
         await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
+
 
 # Обработчик: Удаление товара из корзины
 async def remove_item(callback_query: types.CallbackQuery):

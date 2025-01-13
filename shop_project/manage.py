@@ -3,12 +3,10 @@ import os
 import sys
 from pathlib import Path
 
-# print("sys.path:", sys.path)
-# print("Working Directory:", os.getcwd())
 
 BASE_DIR = Path(__file__).resolve().parent
-sys.path.append(str(BASE_DIR))  # Добавляем корневую директорию в PYTHONPATH
-# print("Current sys.path:", sys.path)
+sys.path.append(str(BASE_DIR))
+
 
 def main():
     """Run administrative tasks."""

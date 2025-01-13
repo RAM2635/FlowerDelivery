@@ -2,6 +2,25 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
+def main_menu_keyboard():
+    """
+    Клавиатура главного меню.
+    """
+    return InlineKeyboardBuilder().row(
+        InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+        InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+    ).as_markup()
+
+
+def back_button_keyboard():
+    """
+    Клавиатура с кнопкой "Назад".
+    """
+    return InlineKeyboardBuilder().row(
+        InlineKeyboardButton(text="Назад", callback_data="main_menu")
+    ).as_markup()
+
+
 def product_keyboard(product_id):
     """
     Клавиатура для добавления товара в корзину.
@@ -25,7 +44,6 @@ def cart_keyboard():
     )
 
 
-
 def quantity_keyboard(product_id, quantity):
     return InlineKeyboardBuilder().row(
         InlineKeyboardButton(text="-", callback_data=f"decrease_quantity_{product_id}_{quantity}"),
@@ -34,7 +52,6 @@ def quantity_keyboard(product_id, quantity):
     ).row(
         InlineKeyboardButton(text="Добавить в корзину", callback_data=f"add_to_cart_{product_id}_{quantity}")
     ).as_markup()
-
 
 
 def disable_keyboard(keyboard: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
@@ -47,3 +64,25 @@ def disable_keyboard(keyboard: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
             for row in keyboard.inline_keyboard
         ]
     )
+
+def cart_actions_keyboard(cart=None):
+    """
+    Клавиатура для управления корзиной.
+    """
+    keyboard = InlineKeyboardBuilder()
+
+    if cart:
+        for item in cart:
+            keyboard.row(
+                InlineKeyboardButton(
+                    text=f"Удалить {item['product_name']}",
+                    callback_data=f"remove_item_{item['product_id']}"
+                )
+            )
+
+    keyboard.row(
+        InlineKeyboardButton(text="Подтвердить заказ", callback_data="start_delivery_process"),
+        InlineKeyboardButton(text="Назад", callback_data="main_menu")
+    )
+
+    return keyboard.as_markup()

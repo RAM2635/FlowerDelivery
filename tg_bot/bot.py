@@ -13,6 +13,8 @@ from handlers.controls import register_handlers as register_controls_handlers, c
     add_active_message, remove_inactive_messages, CART_STORAGE
 from keyboards.inline import product_keyboard, cart_keyboard, quantity_keyboard
 from datetime import datetime
+from tg_bot.keyboards.inline import cart_keyboard
+
 
 # Загрузка переменных окружения
 load_dotenv(".env")

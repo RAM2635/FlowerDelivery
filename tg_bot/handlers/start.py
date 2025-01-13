@@ -4,6 +4,7 @@ from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from services.database import get_user_by_telegram_id, register_user
 from aiogram.fsm.state import State, StatesGroup
+from tg_bot.keyboards.inline import main_menu_keyboard
 
 
 # Состояния FSM для регистрации
@@ -15,11 +16,10 @@ class RegistrationState(StatesGroup):
 async def start_handler(message: types.Message, state: FSMContext):
     user = get_user_by_telegram_id(message.from_user.id)
     if user:
-        keyboard = InlineKeyboardBuilder().row(
-            types.InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-            types.InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-        )
-        await message.answer("Добро пожаловать в магазин!", reply_markup=keyboard.as_markup())
+        await message.answer(
+            "Добро пожаловать в магазин!",
+            reply_markup=main_menu_keyboard()
+        )  # Используем функцию main_menu_keyboard
     else:
         await state.update_data(attempts=3)
         await message.answer("Введите ваше имя:")
