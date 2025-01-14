@@ -4,6 +4,7 @@ from django.utils.timezone import now
 from .forms import CheckoutForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 
 
 @login_required
@@ -66,9 +67,6 @@ def index(request):
     return render(request, 'delivery/index.html', {'media_url': media_url})
 
 
-from django.shortcuts import redirect
-
-
 @login_required
 def checkout(request):
     if request.method == "POST":
@@ -82,6 +80,7 @@ def checkout(request):
         if form.is_valid():
             order = Order.objects.create(
                 user=request.user,
+                recipient_name=form.cleaned_data['recipient_name'],
                 phone=form.cleaned_data['phone'],
                 address=form.cleaned_data['address'],
                 comments=form.cleaned_data.get('comments', ''),

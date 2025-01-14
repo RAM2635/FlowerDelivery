@@ -5,14 +5,17 @@ class CustomUserCreationFormTest(TestCase):
     def test_form_valid_data(self):
         form = CustomUserCreationForm(data={
             'username': 'testuser',
+            'email': 'testuser@example.com',  # Добавлено обязательное поле email
             'password1': 'securePassword123',
             'password2': 'securePassword123',
         })
+        print("Ошибки формы:", form.errors)  # Отладка
         self.assertTrue(form.is_valid())
 
     def test_form_invalid_password_mismatch(self):
         form = CustomUserCreationForm(data={
             'username': 'testuser',
+            'email': 'testuser@example.com',  # Добавлено обязательное поле email
             'password1': 'securePassword123',
             'password2': 'differentPassword123',
         })

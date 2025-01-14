@@ -2,6 +2,15 @@ from django import forms
 
 
 class CheckoutForm(forms.Form):
+    recipient_name = forms.CharField(
+        label="Имя получателя",
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите имя получателя'
+        })
+    )
+
     phone = forms.CharField(
         label="Телефон",
         max_length=20,
