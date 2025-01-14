@@ -1,16 +1,16 @@
 import os
 from aiogram.exceptions import TelegramBadRequest
-from aiogram import types, Dispatcher, F
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import sqlite3
 from aiogram import Bot, types
-from functools import partial
 from dotenv import load_dotenv
 from tg_bot.keyboards.inline import back_button_keyboard
 from tg_bot.keyboards.inline import quantity_keyboard
 from tg_bot.keyboards.inline import main_menu_keyboard
 from tg_bot.keyboards.inline import cart_actions_keyboard
+from services.statuses import translate_status
+
 
 # Локальное хранилище корзин пользователей
 CART_STORAGE = {}
@@ -38,7 +38,9 @@ async def show_orders(callback_query: types.CallbackQuery, bot: Bot):
     if orders:
         text = "Ваши заказы:\n\n"
         for order in orders:
-            text += f"Заказ #{order[0]} от {order[1]}:\n- Товары: {order[3]}\n- Статус: {order[2]}\n\n"
+            human_readable_status = translate_status(order[2])
+            text += f"Заказ #{order[0]} от {order[1]}:\n- Товары: {order[3]}\n- Статус: {human_readable_status}\n\n"
+
     else:
         text = "У вас пока нет заказов."
 
@@ -302,5 +304,3 @@ async def decrease_quantity(callback_query: CallbackQuery):
         await callback_query.answer()
     except Exception as e:
         await callback_query.answer(f"Ошибка: {str(e)}", show_alert=True)
-
-

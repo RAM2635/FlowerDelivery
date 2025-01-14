@@ -8,13 +8,12 @@ from os import getenv
 from dotenv import load_dotenv
 from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
-from handlers.register import register_all_handlers
 from tg_bot.handlers.register import register_all_handlers
-from tg_bot.handlers.controls import check_message_validity, add_active_message, remove_inactive_messages, CART_STORAGE
+from tg_bot.handlers.controls import check_message_validity, add_active_message, CART_STORAGE
 from keyboards.inline import quantity_keyboard
 from datetime import datetime
 from tg_bot.keyboards.inline import cart_keyboard
-
+from services.statuses import translate_status
 
 # Загрузка переменных окружения
 load_dotenv(".env")
@@ -28,8 +27,6 @@ dp = Dispatcher(storage=MemoryStorage())
 
 # Регистрируем обработчики
 register_all_handlers(dp, bot)
-# register_handlers(dp)
-# register_controls_handlers(dp, bot)
 
 # Хранилище для отслеживания активных сообщений пользователей
 active_messages = {}
@@ -39,8 +36,6 @@ active_messages = {}
 class RegistrationState(StatesGroup):
     waiting_for_name = State()
     waiting_for_email = State()
-
-    # Состояния FSM для оформления заказа
 
 
 @dp.callback_query(F.data == "make_order")
@@ -128,12 +123,10 @@ class OrderState(StatesGroup):
 
 @dp.callback_query(F.data == "start_delivery_process")
 async def start_delivery_process(callback_query: types.CallbackQuery, state: FSMContext):
-    print(f"Обработчик start_delivery_process вызван для пользователя {callback_query.from_user.id}")
     await callback_query.message.edit_text(
         "\U0001F4E6 Введите адрес доставки:",
     )
     await state.set_state(OrderState.waiting_for_address)
-    print("FSM: State set to waiting_for_address")
 
 
 @dp.message(OrderState.waiting_for_address)
@@ -141,7 +134,6 @@ async def process_address(message: types.Message, state: FSMContext):
     await state.update_data(address=message.text)
     await message.answer("Введите номер телефона:")
     await state.set_state(OrderState.waiting_for_phone)
-    print(f"Адрес сохранён: {message.text}")
 
 
 @dp.message(OrderState.waiting_for_phone)
@@ -149,7 +141,6 @@ async def process_phone(message: types.Message, state: FSMContext):
     await state.update_data(phone=message.text)
     await message.answer("Введите имя получателя:")
     await state.set_state(OrderState.waiting_for_name)
-    print(f"Телефон сохранён: {message.text}")
 
 
 @dp.message(OrderState.waiting_for_name)
@@ -205,7 +196,6 @@ async def process_name(message: types.Message, state: FSMContext):
         )
     )
     await state.clear()
-    print("Состояние очищено.")
 
 
 @dp.callback_query(F.data == "my_orders")
@@ -246,7 +236,8 @@ async def view_orders(callback_query: types.CallbackQuery):
 
     text = "Ваши заказы:\n\n"
     for order in orders:
-        text += f"Дата: {order[0]}\nСтатус: {order[1]}\nАдрес: {order[2]}\n\n"
+        human_readable_status = translate_status(order[1])
+        text += f"Дата: {order[0]}\nСтатус: {human_readable_status}\nАдрес: {order[2]}\n\n"
 
     await callback_query.message.edit_text(
         text,

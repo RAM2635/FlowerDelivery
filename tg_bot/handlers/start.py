@@ -58,7 +58,7 @@ async def handle_email(message: types.Message, state: FSMContext):
         else:
             await message.answer(
                 "Вы исчерпали все попытки. Пожалуйста, перейдите на сайт для регистрации: "
-                "http://127.0.0.1:8000/users/register/"
+                "http://flowershop/register/"
             )
             await state.clear()
 
