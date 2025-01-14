@@ -1,0 +1,34 @@
+from aiogram import F
+from functools import partial
+from tg_bot.handlers.controls import (
+    show_orders,
+    back_to_main,
+    increase_quantity,
+    decrease_quantity,
+    disabled_callback,
+    add_to_cart_callback,
+    view_cart,
+    remove_item,
+    confirm_order
+)
+from tg_bot.handlers.start import register_handlers as register_start_handlers
+
+
+def register_all_handlers(dp, bot):
+    """
+    Регистрирует все обработчики бота
+    """
+    register_controls_handlers(dp, bot)
+    register_start_handlers(dp)
+
+
+def register_controls_handlers(dp, bot):
+    dp.callback_query.register(partial(show_orders, bot=bot), F.data == "my_orders")
+    dp.callback_query.register(partial(back_to_main, bot=bot), F.data == "main_menu")
+    dp.callback_query.register(increase_quantity, lambda c: c.data.startswith("increase_quantity_"))
+    dp.callback_query.register(decrease_quantity, lambda c: c.data.startswith("decrease_quantity_"))
+    dp.callback_query.register(disabled_callback, F.data == "disabled")
+    dp.callback_query.register(add_to_cart_callback, lambda c: c.data.startswith("add_to_cart_"))
+    dp.callback_query.register(view_cart, F.data == "view_cart")
+    dp.callback_query.register(remove_item, lambda c: c.data.startswith("remove_item_"))
+    dp.callback_query.register(confirm_order, F.data == "confirm_order")
