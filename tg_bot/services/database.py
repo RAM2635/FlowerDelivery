@@ -53,18 +53,19 @@ def is_admin(telegram_id):
     """
     return str(telegram_id) == ADMIN_TELEGRAM_ID
 
-def update_order_status(order_id, new_status, admin_telegram_id):
+def update_order_status(order_id, new_status, admin_telegram_id, database_path):
     """
     Обновить статус заказа.
 
     :param order_id: ID заказа для обновления.
     :param new_status: Новый статус для заказа.
     :param admin_telegram_id: Telegram ID администратора, выполняющего операцию.
+    :param database_path: Путь к базе данных.
     """
     if not is_admin(admin_telegram_id):
         raise PermissionError("Пользователь не имеет прав администратора.")
 
-    with sqlite3.connect(DATABASE_PATH) as conn:
+    with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
 
         # Обновить статус и дату завершения заказа, если необходимо
