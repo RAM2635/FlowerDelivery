@@ -3,6 +3,7 @@ from aiogram import Bot, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.statuses import translate_status
 from services.database import update_order_status, is_admin
+from services.database import is_admin
 
 
 async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
@@ -97,21 +98,36 @@ async def handle_order_update(callback_query: types.CallbackQuery, bot: Bot, dat
 
 
 async def back_to_admin_menu(callback_query: types.CallbackQuery, bot: Bot):
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-                InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-            ],
-            [
-                InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
-                InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
-            ],
-        ]
-    )
+    user_id = callback_query.from_user.id
+
+    # Проверяем, является ли пользователь администратором
+    if is_admin(user_id):
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                    InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+                ],
+                [
+                    InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
+                    InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
+                ],
+            ]
+        )
+        welcome_text = "Добро пожаловать в меню администратора!"
+    else:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                    InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+                ],
+            ]
+        )
+        welcome_text = "Добро пожаловать в магазин!"
 
     await callback_query.message.edit_text(
-        "Добро пожаловать в меню администратора!",
+        welcome_text,
         reply_markup=keyboard
     )
 
