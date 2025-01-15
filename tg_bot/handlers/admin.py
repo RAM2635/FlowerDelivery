@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.statuses import translate_status
 from services.database import update_order_status, is_admin
 from services.database import is_admin
+from tg_bot.keyboards.inline import admin_order_keyboard, back_to_admin_menu_keyboard
 
 
 async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
@@ -33,24 +34,8 @@ async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, datab
     for order in orders:
         order_id, status, date_created, username = order
         translated_status = translate_status(status)
-        buttons = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="В обработку",
-                        callback_data=f"update_order_{order_id}_processing"
-                    ),
-                    InlineKeyboardButton(
-                        text="Завершён",
-                        callback_data=f"update_order_{order_id}_completed"
-                    ),
-                    InlineKeyboardButton(
-                        text="Отменён",
-                        callback_data=f"update_order_{order_id}_cancelled"
-                    ),
-                ]
-            ]
-        )
+        buttons = admin_order_keyboard(order_id)
+
         await bot.send_message(
             chat_id=callback_query.from_user.id,
             text=(
@@ -63,9 +48,8 @@ async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, datab
         )
 
     # Добавляем кнопку "Назад" после вывода заказов
-    back_button = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu")]]
-    )
+    back_button = back_to_admin_menu_keyboard()
+
     await bot.send_message(callback_query.from_user.id, "Выберите действие:", reply_markup=back_button)
 
 

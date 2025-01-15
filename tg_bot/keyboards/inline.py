@@ -86,3 +86,26 @@ def cart_actions_keyboard(cart=None):
     )
 
     return keyboard.as_markup()
+
+
+def admin_order_keyboard(order_id):
+    """
+    Клавиатура для управления статусом заказа.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="В обработку", callback_data=f"update_order_{order_id}_processing"),
+                InlineKeyboardButton(text="Завершён", callback_data=f"update_order_{order_id}_completed"),
+                InlineKeyboardButton(text="Отменён", callback_data=f"update_order_{order_id}_cancelled"),
+            ]
+        ]
+    )
+
+def back_to_admin_menu_keyboard():
+    """
+    Клавиатура с кнопкой "Назад" для возврата в меню администратора.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu")]]
+    )
