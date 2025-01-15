@@ -109,3 +109,35 @@ def back_to_admin_menu_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu")]]
     )
+
+
+def user_main_menu_keyboard():
+    """
+    Клавиатура для обычного пользователя.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+            ],
+        ]
+    )
+
+
+def admin_main_menu_keyboard():
+    """
+    Клавиатура для администратора.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+            ],
+            [
+                InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
+                InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
+            ],
+        ]
+    )

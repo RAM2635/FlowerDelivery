@@ -4,7 +4,7 @@ from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from services.database import get_user_by_telegram_id, register_user
 from aiogram.fsm.state import State, StatesGroup
-from tg_bot.keyboards.inline import main_menu_keyboard
+from tg_bot.keyboards.inline import user_main_menu_keyboard, admin_main_menu_keyboard
 from services.database import is_admin
 
 # Состояния FSM для регистрации
@@ -16,22 +16,17 @@ class RegistrationState(StatesGroup):
 async def start_handler(message: types.Message, state: FSMContext):
     user = get_user_by_telegram_id(message.from_user.id)
     if user:
-        keyboard = InlineKeyboardBuilder().row(
-            types.InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-            types.InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-        )
-
-        # Если пользователь администратор, добавляем кнопки
         if is_admin(message.from_user.id):
-            keyboard.row(
-                types.InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
-                types.InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder")
-            )
+            keyboard = admin_main_menu_keyboard()
+        else:
+            keyboard = user_main_menu_keyboard()
 
         await message.answer(
             "Добро пожаловать в магазин!",
-            reply_markup=keyboard.as_markup()
+            reply_markup=keyboard
         )
+
+
     else:
         await state.update_data(attempts=3)
         await message.answer("Введите ваше имя, как на flowershop:")
