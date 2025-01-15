@@ -1,6 +1,6 @@
 from aiogram import F
 from functools import partial
-from tg_bot.handlers.admin import list_admin_orders, handle_order_update
+from tg_bot.handlers.admin import list_admin_orders, handle_order_update, analytics_placeholder, back_to_admin_menu
 from tg_bot.handlers.controls import (
     show_orders,
     back_to_main,
@@ -38,4 +38,7 @@ def register_controls_handlers(dp, bot):
 
 def register_admin_handlers(dp, bot, database_path):
     dp.message.register(partial(list_admin_orders, bot=bot, database_path=database_path), F.text == "/admin_orders")
+    dp.callback_query.register(partial(list_admin_orders, bot=bot, database_path=database_path), F.data == "admin_orders")
     dp.callback_query.register(partial(handle_order_update, bot=bot, database_path=database_path), F.data.startswith("update_order_"))
+    dp.callback_query.register(analytics_placeholder, F.data == "analytics_placeholder")
+    dp.callback_query.register(partial(back_to_admin_menu, bot=bot), F.data == "back_to_admin_menu")

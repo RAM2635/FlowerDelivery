@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from services.database import get_user_by_telegram_id, register_user
 from aiogram.fsm.state import State, StatesGroup
 from tg_bot.keyboards.inline import main_menu_keyboard
-
+from services.database import is_admin
 
 # Состояния FSM для регистрации
 class RegistrationState(StatesGroup):
@@ -16,22 +16,33 @@ class RegistrationState(StatesGroup):
 async def start_handler(message: types.Message, state: FSMContext):
     user = get_user_by_telegram_id(message.from_user.id)
     if user:
+        keyboard = InlineKeyboardBuilder().row(
+            types.InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+            types.InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+        )
+
+        # Если пользователь администратор, добавляем кнопки
+        if is_admin(message.from_user.id):
+            keyboard.row(
+                types.InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
+                types.InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder")
+            )
+
         await message.answer(
             "Добро пожаловать в магазин!",
-            reply_markup=main_menu_keyboard()
-        )  # Используем функцию main_menu_keyboard
+            reply_markup=keyboard.as_markup()
+        )
     else:
         await state.update_data(attempts=3)
-        await message.answer("Введите ваше имя:")
+        await message.answer("Введите ваше имя, как на flowershop:")
         await state.set_state(RegistrationState.waiting_for_name)
-
 
 async def handle_name(message: types.Message, state: FSMContext):
     data = await state.get_data()
     attempts = data.get("attempts", 3)
 
     await state.update_data(name=message.text, attempts=attempts)
-    await message.answer("Введите ваш email:")
+    await message.answer("Введите ваш email, как на flowershop:")
     await state.set_state(RegistrationState.waiting_for_email)
 
 
@@ -58,7 +69,7 @@ async def handle_email(message: types.Message, state: FSMContext):
         else:
             await message.answer(
                 "Вы исчерпали все попытки. Пожалуйста, перейдите на сайт для регистрации: "
-                "http://flowershop/register/"
+                "http://flowershop.hom/register/"
             )
             await state.clear()
 

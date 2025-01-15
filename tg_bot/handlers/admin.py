@@ -5,13 +5,12 @@ from services.statuses import translate_status
 from services.database import update_order_status, is_admin
 
 
-
-async def list_admin_orders(message: types.Message, bot: Bot, database_path: str):
-    admin_telegram_id = message.from_user.id
+async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
+    admin_telegram_id = callback_query.from_user.id
 
     # Проверяем права администратора
     if not is_admin(admin_telegram_id):
-        await message.answer("У вас нет прав администратора.")
+        await callback_query.answer("У вас нет прав администратора.")
         return
 
     # Получаем список заказов из базы данных
@@ -26,7 +25,7 @@ async def list_admin_orders(message: types.Message, bot: Bot, database_path: str
 
     # Если заказов нет
     if not orders:
-        await message.answer("Нет доступных заказов.")
+        await callback_query.message.edit_text("Нет доступных заказов.")
         return
 
     # Формируем список заказов
@@ -51,13 +50,22 @@ async def list_admin_orders(message: types.Message, bot: Bot, database_path: str
                 ]
             ]
         )
-        await message.answer(
-            f"Заказ #{order_id}\n"
-            f"Статус: {translated_status}\n"
-            f"Дата: {date_created}\n"
-            f"Пользователь: {username}",
+        await bot.send_message(
+            chat_id=callback_query.from_user.id,
+            text=(
+                f"Заказ #{order_id}\n"
+                f"Статус: {translated_status}\n"
+                f"Дата: {date_created}\n"
+                f"Пользователь: {username}"
+            ),
             reply_markup=buttons
         )
+
+    # Добавляем кнопку "Назад" после вывода заказов
+    back_button = InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu")]]
+    )
+    await bot.send_message(callback_query.from_user.id, "Выберите действие:", reply_markup=back_button)
 
 
 async def handle_order_update(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
@@ -87,3 +95,26 @@ async def handle_order_update(callback_query: types.CallbackQuery, bot: Bot, dat
     except PermissionError:
         await callback_query.answer("У вас нет прав для выполнения этой операции.")
 
+
+async def back_to_admin_menu(callback_query: types.CallbackQuery, bot: Bot):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+            ],
+            [
+                InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
+                InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
+            ],
+        ]
+    )
+
+    await callback_query.message.edit_text(
+        "Добро пожаловать в меню администратора!",
+        reply_markup=keyboard
+    )
+
+
+async def analytics_placeholder(callback_query: types.CallbackQuery):
+    await callback_query.answer("Раздел аналитики находится в разработке.", show_alert=True)
