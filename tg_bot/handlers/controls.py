@@ -7,9 +7,10 @@ from aiogram import Bot, types
 from dotenv import load_dotenv
 from tg_bot.keyboards.inline import back_button_keyboard
 from tg_bot.keyboards.inline import quantity_keyboard
-from tg_bot.keyboards.inline import main_menu_keyboard
 from tg_bot.keyboards.inline import cart_actions_keyboard
 from services.statuses import translate_status
+from tg_bot.keyboards.inline import dynamic_main_menu_keyboard
+from services.database import is_admin
 
 
 # Локальное хранилище корзин пользователей
@@ -85,8 +86,8 @@ async def back_to_main(callback_query: CallbackQuery, bot: Bot):
 
     new_message = await bot.send_message(
         chat_id=user_id,
-        text="Добро пожаловать в магазин!",
-        reply_markup=main_menu_keyboard()
+        text="Добро пожаловать в магазин!" if not is_admin(user_id) else "Добро пожаловать в меню администратора!",
+        reply_markup=dynamic_main_menu_keyboard(is_admin=user_id)
     )
 
     add_active_message(user_id, new_message.message_id)

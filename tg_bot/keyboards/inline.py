@@ -141,3 +141,27 @@ def admin_main_menu_keyboard():
             ],
         ]
     )
+
+
+
+
+def dynamic_main_menu_keyboard(is_admin: bool):
+    """
+    Формирует клавиатуру главного меню в зависимости от статуса пользователя.
+    """
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
+                InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+            ],
+        ]
+    )
+    if is_admin:
+        keyboard.inline_keyboard.append(
+            [
+                InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
+                InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
+            ]
+        )
+    return keyboard
