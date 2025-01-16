@@ -1,13 +1,16 @@
 import sqlite3
 from aiogram import Bot, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.statuses import translate_status
 from services.database import update_order_status, is_admin
-from services.database import is_admin
-from tg_bot.keyboards.inline import admin_order_keyboard, back_to_admin_menu_keyboard
-from tg_bot.keyboards.inline import analytics_menu_keyboard
-from tg_bot.keyboards.inline import back_to_admin_menu_keyboard
-from tg_bot.keyboards.inline import analytics_back_keyboard
+from tg_bot.keyboards.inline import (
+    admin_order_keyboard,
+    user_main_menu_keyboard,
+    analytics_menu_keyboard,
+    back_to_admin_menu_keyboard,
+    analytics_back_keyboard,
+    admin_main_menu_keyboard,
+)
+
 
 async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
     admin_telegram_id = callback_query.from_user.id
@@ -84,33 +87,16 @@ async def handle_order_update(callback_query: types.CallbackQuery, bot: Bot, dat
 
 
 async def back_to_admin_menu(callback_query: types.CallbackQuery, bot: Bot):
+    """
+    Обработчик для возврата в главное меню администратора.
+    """
     user_id = callback_query.from_user.id
-
-    # Проверяем, является ли пользователь администратором
     if is_admin(user_id):
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-                    InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-                ],
-                [
-                    InlineKeyboardButton(text="Статус", callback_data="admin_orders"),
-                    InlineKeyboardButton(text="Аналитика", callback_data="analytics_placeholder"),
-                ],
-            ]
-        )
         welcome_text = "Добро пожаловать в меню администратора!"
+        keyboard = admin_main_menu_keyboard()
     else:
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-                    InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
-                ],
-            ]
-        )
         welcome_text = "Добро пожаловать в магазин!"
+        keyboard = user_main_menu_keyboard()  # Используем уже готовую клавиатуру для обычного пользователя.
 
     await callback_query.message.edit_text(
         welcome_text,
