@@ -65,6 +65,7 @@ def disable_keyboard(keyboard: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         ]
     )
 
+
 def cart_actions_keyboard(cart=None):
     """
     Клавиатура для управления корзиной.
@@ -101,6 +102,7 @@ def admin_order_keyboard(order_id):
             ]
         ]
     )
+
 
 def back_to_admin_menu_keyboard():
     """
@@ -143,8 +145,6 @@ def admin_main_menu_keyboard():
     )
 
 
-
-
 def dynamic_main_menu_keyboard(is_admin: bool):
     """
     Формирует клавиатуру главного меню в зависимости от статуса пользователя.
@@ -165,3 +165,36 @@ def dynamic_main_menu_keyboard(is_admin: bool):
             ]
         )
     return keyboard
+
+
+def analytics_menu_keyboard():
+    """
+    Клавиатура для меню аналитики.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Распределение по статусам", callback_data="analytics_statuses"),
+                InlineKeyboardButton(text="Распределение по пользователям", callback_data="analytics_users"),
+            ],
+            [
+                InlineKeyboardButton(text="Популярные продукты", callback_data="analytics_products"),
+                InlineKeyboardButton(text="Распределение по датам", callback_data="analytics_dates"),
+            ],
+            [
+                InlineKeyboardButton(text="Назад", callback_data="back_to_analytics_menu"),
+            ]
+        ]
+    )
+
+
+
+def analytics_back_keyboard():
+    """
+    Клавиатура с кнопкой "Назад" для возврата в меню аналитики.
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Назад", callback_data="back_to_analytics_menu")]
+        ]
+    )

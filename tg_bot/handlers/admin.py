@@ -5,7 +5,9 @@ from services.statuses import translate_status
 from services.database import update_order_status, is_admin
 from services.database import is_admin
 from tg_bot.keyboards.inline import admin_order_keyboard, back_to_admin_menu_keyboard
-
+from tg_bot.keyboards.inline import analytics_menu_keyboard
+from tg_bot.keyboards.inline import back_to_admin_menu_keyboard
+from tg_bot.keyboards.inline import analytics_back_keyboard
 
 async def list_admin_orders(callback_query: types.CallbackQuery, bot: Bot, database_path: str):
     admin_telegram_id = callback_query.from_user.id
@@ -117,4 +119,96 @@ async def back_to_admin_menu(callback_query: types.CallbackQuery, bot: Bot):
 
 
 async def analytics_placeholder(callback_query: types.CallbackQuery):
-    await callback_query.answer("Раздел аналитики находится в разработке.", show_alert=True)
+    """
+    Обработчик кнопки "Аналитика".
+    """
+    # Отправляем меню аналитики
+    await callback_query.message.edit_text(
+        "Выберите интересующий вас отчёт:",
+        reply_markup=analytics_menu_keyboard()
+    )
+
+
+async def analytics_statuses(callback_query: types.CallbackQuery, database_path=None):
+    """
+    Распределение заказов по статусам.
+    """
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT status, COUNT(*) FROM delivery_order GROUP BY status;")
+        results = cursor.fetchall()
+
+    text = "Распределение заказов по статусам:\n"
+    for status, count in results:
+        text += f"- {status}: {count}\n"
+
+    await callback_query.message.edit_text(text, reply_markup=analytics_back_keyboard())
+
+
+async def analytics_users(callback_query: types.CallbackQuery, database_path=None):
+    """
+    Распределение заказов по пользователям.
+    """
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT c.username, COUNT(*) 
+            FROM delivery_order o
+            JOIN delivery_customuser c ON o.user_id = c.id
+            GROUP BY c.username;
+        """)
+        results = cursor.fetchall()
+
+    text = "Распределение заказов по пользователям:\n"
+    for user, count in results:
+        text += f"- {user}: {count}\n"
+
+    await callback_query.message.edit_text(text, reply_markup=analytics_back_keyboard())
+
+
+async def analytics_products(callback_query: types.CallbackQuery, database_path=None):
+    """
+    Популярные продукты.
+    """
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT p.name, COUNT(*)
+            FROM delivery_orderproduct op
+            JOIN delivery_product p ON op.product_id = p.id
+            GROUP BY p.name
+            ORDER BY COUNT(*) DESC;
+        """)
+        results = cursor.fetchall()
+
+    text = "Популярные продукты:\n"
+    for product, count in results:
+        text += f"- {product}: {count}\n"
+
+    await callback_query.message.edit_text(text, reply_markup=analytics_back_keyboard())
+
+
+async def analytics_dates(callback_query: types.CallbackQuery, database_path=None):
+    """
+    Распределение заказов по датам.
+    """
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT date_created, COUNT(*) FROM delivery_order GROUP BY date_created;")
+        results = cursor.fetchall()
+
+    text = "Распределение заказов по датам:\n"
+    for date, count in results:
+        text += f"- {date}: {count}\n"
+
+    await callback_query.message.edit_text(text, reply_markup=analytics_back_keyboard())
+
+
+async def back_to_analytics_menu(callback_query: types.CallbackQuery):
+    """
+    Обработчик для возврата в меню аналитики.
+    """
+    await callback_query.message.edit_text(
+        "Выберите интересующий вас отчёт:",
+        reply_markup=analytics_menu_keyboard()
+    )
