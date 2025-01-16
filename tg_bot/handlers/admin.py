@@ -208,7 +208,21 @@ async def back_to_analytics_menu(callback_query: types.CallbackQuery):
     """
     Обработчик для возврата в меню аналитики.
     """
-    await callback_query.message.edit_text(
-        "Выберите интересующий вас отчёт:",
-        reply_markup=analytics_menu_keyboard()
-    )
+    new_text = "Выберите интересующий вас отчёт:"
+    new_markup = analytics_menu_keyboard()
+
+    # Проверяем, нужно ли обновлять текст или клавиатуру
+    if callback_query.message.text != new_text:
+        await callback_query.message.edit_text(
+            new_text,
+            reply_markup=new_markup
+        )
+    elif callback_query.message.reply_markup != new_markup:
+        await callback_query.message.edit_reply_markup(
+            reply_markup=new_markup
+        )
+    else:
+        # Если ничего не изменилось, просто ответить на callback
+        await callback_query.answer("Вы уже в меню аналитики.")
+
+

@@ -182,7 +182,7 @@ def analytics_menu_keyboard():
                 InlineKeyboardButton(text="Распределение по датам", callback_data="analytics_dates"),
             ],
             [
-                InlineKeyboardButton(text="Назад", callback_data="back_to_analytics_menu"),
+                InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu"),
             ]
         ]
     )

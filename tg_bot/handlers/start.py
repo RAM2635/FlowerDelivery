@@ -22,7 +22,7 @@ async def start_handler(message: types.Message, state: FSMContext):
             keyboard = user_main_menu_keyboard()
 
         await message.answer(
-            "Добро пожаловать в магазин!",
+            "Добро пожаловать в меню администратора!",
             reply_markup=keyboard
         )
 
