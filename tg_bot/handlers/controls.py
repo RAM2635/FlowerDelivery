@@ -193,7 +193,6 @@ async def view_cart(callback_query: types.CallbackQuery):
     except Exception as e:
         await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
 
-
 # Обработчик: Удаление товара из корзины
 async def remove_item(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id

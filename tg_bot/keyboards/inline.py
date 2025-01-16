@@ -81,12 +81,17 @@ def cart_actions_keyboard(cart=None):
                 )
             )
 
+    if cart:  # Кнопка подтверждения только если корзина не пуста
+        keyboard.row(
+            InlineKeyboardButton(text="Подтвердить заказ", callback_data="start_delivery_process")
+        )
+
     keyboard.row(
-        InlineKeyboardButton(text="Подтвердить заказ", callback_data="start_delivery_process"),
         InlineKeyboardButton(text="Назад", callback_data="main_menu")
     )
 
     return keyboard.as_markup()
+
 
 
 def admin_order_keyboard(order_id):
