@@ -69,7 +69,3 @@ async def handle_email(message: types.Message, state: FSMContext):
             await state.clear()
 
 
-def register_handlers(dp: Dispatcher):
-    dp.message.register(start_handler, CommandStart())
-    dp.message.register(handle_name, RegistrationState.waiting_for_name)
-    dp.message.register(handle_email, RegistrationState.waiting_for_email)

@@ -1,5 +1,11 @@
-from aiogram import F
-from functools import partial
+from aiogram import Dispatcher, F
+from aiogram.filters import CommandStart
+from tg_bot.handlers.start import (
+    start_handler,
+    handle_name,
+    handle_email,
+    RegistrationState,
+)
 from tg_bot.handlers.admin import (
     list_admin_orders,
     handle_order_update,
@@ -9,7 +15,7 @@ from tg_bot.handlers.admin import (
     analytics_users,
     analytics_products,
     analytics_dates,
-    back_to_analytics_menu
+    back_to_analytics_menu,
 )
 from tg_bot.handlers.controls import (
     show_orders,
@@ -20,9 +26,15 @@ from tg_bot.handlers.controls import (
     add_to_cart_callback,
     view_cart,
     remove_item,
-    confirm_order
+    confirm_order,
 )
-from tg_bot.handlers.start import register_handlers as register_start_handlers
+from functools import partial
+
+
+def register_start_handlers(dp: Dispatcher):
+    dp.message.register(start_handler, CommandStart())
+    dp.message.register(handle_name, RegistrationState.waiting_for_name)
+    dp.message.register(handle_email, RegistrationState.waiting_for_email)
 
 
 def register_all_handlers(dp, bot, database_path):
