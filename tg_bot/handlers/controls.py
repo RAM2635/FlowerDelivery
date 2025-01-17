@@ -20,6 +20,7 @@ DATABASE_PATH = os.getenv("DATABASE_PATH")
 
 
 # Обработчик: Просмотр заказов
+async def show_orders(callback_query: types.CallbackQuery, bot: Bot):
     telegram_id = callback_query.from_user.id
     with sqlite3.connect(DATABASE_PATH) as conn:
         cursor = conn.cursor()
@@ -105,6 +106,7 @@ async def disabled_callback(callback_query: CallbackQuery):
 
 
 # Обработчик: Добавление товара в корзину
+async def add_to_cart_callback(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     data = callback_query.data.split("_")
 
@@ -152,6 +154,7 @@ async def disabled_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Товар '{product_name}' добавлен в корзину!")
 
 
+async def view_cart(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     cart = CART_STORAGE.get(user_id, [])
 
@@ -238,6 +241,7 @@ async def remove_item(callback_query: types.CallbackQuery):
 
 
 # Обработчик: Подтверждение заказа
+async def confirm_order(callback_query: types.CallbackQuery):
     # print(f"Обработчик confirm_order вызван для пользователя {callback_query.from_user.id}")
     user_id = callback_query.from_user.id
     cart = CART_STORAGE.get(user_id, [])
@@ -297,6 +301,7 @@ async def check_message_validity(callback_query: CallbackQuery) -> bool:
 
 
 # Обработчик увеличения количества товара
+async def increase_quantity(callback_query: CallbackQuery):
     if not await check_message_validity(callback_query):
         return
 
@@ -316,6 +321,7 @@ async def check_message_validity(callback_query: CallbackQuery) -> bool:
 
 
 # Обработчик уменьшения количества товара
+async def decrease_quantity(callback_query: CallbackQuery):
     if not await check_message_validity(callback_query):
         return
 
