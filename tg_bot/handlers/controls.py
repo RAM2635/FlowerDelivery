@@ -242,7 +242,7 @@ async def remove_item(callback_query: types.CallbackQuery):
 
 # Обработчик: Подтверждение заказа
 async def confirm_order(callback_query: types.CallbackQuery):
-    print(f"Обработчик confirm_order вызван для пользователя {callback_query.from_user.id}")
+    # print(f"Обработчик confirm_order вызван для пользователя {callback_query.from_user.id}")
     user_id = callback_query.from_user.id
     cart = CART_STORAGE.get(user_id, [])
 
@@ -278,7 +278,7 @@ async def check_message_validity(callback_query: CallbackQuery) -> bool:
     message_id = callback_query.message.message_id
 
     # Лог для отладки
-    print(f"Проверка валидности сообщения: {message_id} для пользователя {user_id}")
+    # print(f"Проверка валидности сообщения: {message_id} для пользователя {user_id}")
 
     # Проверяем наличие активных сообщений для пользователя
     if user_id not in active_messages or not any(

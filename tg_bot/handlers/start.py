@@ -1,7 +1,5 @@
 from aiogram import types, Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import CommandStart
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from services.database import get_user_by_telegram_id, register_user
 from aiogram.fsm.state import State, StatesGroup
 from tg_bot.keyboards.inline import user_main_menu_keyboard, admin_main_menu_keyboard
@@ -48,18 +46,18 @@ async def handle_email(message: types.Message, state: FSMContext):
     attempts = data.get("attempts", 3)
 
     if register_user(message.from_user.id, name, email):
-        keyboard = InlineKeyboardBuilder().row(
-            types.InlineKeyboardButton(text="Мои заказы", callback_data="my_orders"),
-            types.InlineKeyboardButton(text="Сделать заказ", callback_data="make_order"),
+        await message.answer(
+            "Регистрация завершена. Добро пожаловать в магазин!",
+            reply_markup=user_main_menu_keyboard()
         )
-        await message.answer("Регистрация завершена. Добро пожаловать в магазин!", reply_markup=keyboard.as_markup())
         await state.clear()
     else:
         attempts -= 1
         if attempts > 0:
             await state.update_data(attempts=attempts)
             await message.answer(
-                f"Имя и email не найдены в базе данных. У вас осталось {attempts} попыток.\nВведите ваше имя:")
+                f"Имя и email не найдены в базе данных. У вас осталось {attempts} попыток.\nВведите ваше имя:"
+            )
             await state.set_state(RegistrationState.waiting_for_name)
         else:
             await message.answer(
