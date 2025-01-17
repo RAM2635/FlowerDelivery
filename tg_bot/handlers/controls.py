@@ -5,11 +5,10 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import sqlite3
 from aiogram import Bot, types
 from dotenv import load_dotenv
-from tg_bot.keyboards.inline import back_button_keyboard
+from tg_bot.keyboards.inline import back_button_keyboard, admin_main_menu_keyboard, user_main_menu_keyboard
 from tg_bot.keyboards.inline import quantity_keyboard
 from tg_bot.keyboards.inline import cart_actions_keyboard
 from services.statuses import translate_status
-from tg_bot.keyboards.inline import dynamic_main_menu_keyboard
 from services.database import is_admin
 
 
@@ -72,7 +71,7 @@ async def back_to_main(callback_query: CallbackQuery, bot: Bot):
                     await bot.edit_message_reply_markup(
                         chat_id=user_id,
                         message_id=message_id,
-                        reply_markup=InlineKeyboardMarkup(inline_keyboard=[])
+                        reply_markup=InlineKeyboardMarkup(inline_keyboard=[])  # Отключаем кнопки
                     )
                     message_info['keyboard_active'] = False
                 updated_messages.append(message_info)
@@ -84,11 +83,19 @@ async def back_to_main(callback_query: CallbackQuery, bot: Bot):
 
         active_messages[user_id] = updated_messages
 
-    new_message = await bot.send_message(
-        chat_id=user_id,
-        text="Добро пожаловать в магазин!" if not is_admin(user_id) else "Добро пожаловать в меню администратора!",
-        reply_markup=dynamic_main_menu_keyboard(is_admin=user_id)
-    )
+    # Проверяем, является ли пользователь администратором
+    if is_admin(user_id):
+        new_message = await bot.send_message(
+            chat_id=user_id,
+            text="Добро пожаловать в меню администратора!",
+            reply_markup=admin_main_menu_keyboard()
+        )
+    else:
+        new_message = await bot.send_message(
+            chat_id=user_id,
+            text="Добро пожаловать в магазин!",
+            reply_markup=user_main_menu_keyboard()
+        )
 
     add_active_message(user_id, new_message.message_id)
 
@@ -151,7 +158,35 @@ async def view_cart(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     cart = CART_STORAGE.get(user_id, [])
 
-    # Удаляем старое сообщение (если возможно)
+    # Отключение inline-кнопок для всех предыдущих сообщений пользователя
+    if user_id in active_messages:
+        updated_messages = []
+
+        for message_info in active_messages[user_id]:
+            if isinstance(message_info, int):
+                message_info = {'message_id': message_info, 'keyboard_active': True}
+
+            message_id = message_info['message_id']
+            is_keyboard_active = message_info['keyboard_active']
+
+            try:
+                if is_keyboard_active:
+                    await callback_query.bot.edit_message_reply_markup(
+                        chat_id=user_id,
+                        message_id=message_id,
+                        reply_markup=InlineKeyboardMarkup(inline_keyboard=[])  # Отключаем кнопки
+                    )
+                    message_info['keyboard_active'] = False
+                updated_messages.append(message_info)
+            except TelegramBadRequest as e:
+                if "message to edit not found" in str(e):
+                    print(f"Сообщение {message_id} не найдено, пропускаем.")
+                else:
+                    print(f"Ошибка отключения клавиатуры для сообщения {message_id}: {e}")
+
+        active_messages[user_id] = updated_messages
+
+    # Удаляем старое сообщение корзины (если возможно)
     try:
         await callback_query.message.delete()
     except Exception as e:
@@ -167,7 +202,7 @@ async def view_cart(callback_query: types.CallbackQuery):
             # Добавляем сообщение в active_messages
             if user_id not in active_messages:
                 active_messages[user_id] = []
-            active_messages[user_id].append(new_message.message_id)
+            active_messages[user_id].append({'message_id': new_message.message_id, 'keyboard_active': True})
         except Exception as e:
             await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
         return
@@ -182,14 +217,14 @@ async def view_cart(callback_query: types.CallbackQuery):
 
     text += f"\nОбщая сумма: {total} руб."
 
-    # Используем новую функцию для создания клавиатуры
+    # Отправляем новое сообщение с корзиной
     try:
         new_message = await callback_query.message.answer(
             text, reply_markup=cart_actions_keyboard(cart)
         )
         if user_id not in active_messages:
             active_messages[user_id] = []
-        active_messages[user_id].append(new_message.message_id)
+        active_messages[user_id].append({'message_id': new_message.message_id, 'keyboard_active': True})
     except Exception as e:
         await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
 
