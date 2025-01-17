@@ -1,9 +1,9 @@
 from aiogram import types, Dispatcher
 from aiogram.fsm.context import FSMContext
-from services.database import get_user_by_telegram_id, register_user
 from aiogram.fsm.state import State, StatesGroup
 from tg_bot.keyboards.inline import user_main_menu_keyboard, admin_main_menu_keyboard
-from services.database import is_admin
+from tg_bot.services.database import is_admin
+from tg_bot.services.database import get_user_by_telegram_id, register_user
 
 # Состояния FSM для регистрации
 class RegistrationState(StatesGroup):

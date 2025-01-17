@@ -14,7 +14,7 @@ from tg_bot.handlers.controls import check_message_validity, add_active_message,
 from keyboards.inline import quantity_keyboard, user_main_menu_keyboard
 from datetime import datetime
 from tg_bot.keyboards.inline import cart_keyboard
-from services.statuses import translate_status
+from tg_bot.services.statuses import translate_status
 
 # Загрузка переменных окружения
 load_dotenv(".env")

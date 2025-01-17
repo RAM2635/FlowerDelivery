@@ -1,7 +1,7 @@
 import sqlite3
 from aiogram import Bot, types
-from services.statuses import translate_status
-from services.database import update_order_status, is_admin
+from tg_bot.services.statuses import translate_status
+from tg_bot.services.database import update_order_status, is_admin
 from tg_bot.keyboards.inline import (
     admin_order_keyboard,
     user_main_menu_keyboard,
