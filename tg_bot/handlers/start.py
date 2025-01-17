@@ -35,7 +35,7 @@ async def handle_name(message: types.Message, state: FSMContext):
     attempts = data.get("attempts", 3)
 
     await state.update_data(name=message.text, attempts=attempts)
-    await message.answer("Введите ваш email, как на flowershop:")
+    await message.answer("📧Введите ваш email, как на flowershop:")
     await state.set_state(RegistrationState.waiting_for_email)
 
 
@@ -47,7 +47,7 @@ async def handle_email(message: types.Message, state: FSMContext):
 
     if register_user(message.from_user.id, name, email):
         await message.answer(
-            "Регистрация завершена. Добро пожаловать в магазин!",
+            "Регистрация завершена🎉. Добро пожаловать в магазин!",
             reply_markup=user_main_menu_keyboard()
         )
         await state.clear()
@@ -67,3 +67,9 @@ async def handle_email(message: types.Message, state: FSMContext):
             await state.clear()
 
 
+async def exit_handler(message: types.Message, state: FSMContext):
+    """
+    Обработчик команды /exit для выхода из бота.
+    """
+    await state.clear()  # Очищаем состояние пользователя
+    await message.answer("Вы вышли из бота. До скорой встречи! 👋", reply_markup=types.ReplyKeyboardRemove())

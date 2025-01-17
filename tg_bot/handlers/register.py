@@ -1,10 +1,10 @@
 from aiogram import Dispatcher, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from tg_bot.handlers.start import (
     start_handler,
     handle_name,
     handle_email,
-    RegistrationState,
+    RegistrationState, exit_handler,
 )
 from tg_bot.handlers.admin import (
     list_admin_orders,
@@ -33,6 +33,7 @@ from functools import partial
 
 def register_start_handlers(dp: Dispatcher):
     dp.message.register(start_handler, CommandStart())
+    dp.message.register(exit_handler, Command("exit")) # Регистрация команды /exit
     dp.message.register(handle_name, RegistrationState.waiting_for_name)
     dp.message.register(handle_email, RegistrationState.waiting_for_email)
 

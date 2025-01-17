@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -10,7 +11,7 @@ from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
 from tg_bot.handlers.register import register_all_handlers
 from tg_bot.handlers.controls import check_message_validity, add_active_message, CART_STORAGE
-from keyboards.inline import quantity_keyboard
+from keyboards.inline import quantity_keyboard, user_main_menu_keyboard
 from datetime import datetime
 from tg_bot.keyboards.inline import cart_keyboard
 from services.statuses import translate_status
@@ -132,24 +133,47 @@ async def start_delivery_process(callback_query: types.CallbackQuery, state: FSM
 @dp.message(OrderState.waiting_for_address)
 async def process_address(message: types.Message, state: FSMContext):
     await state.update_data(address=message.text)
-    await message.answer("Введите номер телефона:")
+    await message.answer("☎️Введите номер телефона:")
     await state.set_state(OrderState.waiting_for_phone)
+
+
+# Валидация номера телефона
+def validate_phone(phone: str) -> bool:
+    return bool(re.match(r"^\d{10}$", phone))
 
 
 @dp.message(OrderState.waiting_for_phone)
 async def process_phone(message: types.Message, state: FSMContext):
-    await state.update_data(phone=message.text)
+    phone = message.text
+    if not validate_phone(phone):
+        await message.answer("Пожалуйста, введите корректный номер телефона из 10 цифр (без пробелов и знаков).")
+        return
+
+    await state.update_data(phone=phone)
     await message.answer("Введите имя получателя:")
     await state.set_state(OrderState.waiting_for_name)
 
 
+# Валидация имени
+def validate_name(name: str) -> bool:
+    return bool(re.match(r"^[A-Za-zА-Яа-яёЁ\s]{2,40}$", name))
+
+
 @dp.message(OrderState.waiting_for_name)
 async def process_name(message: types.Message, state: FSMContext):
+    name = message.text
+    if not validate_name(name):
+        await message.answer("Пожалуйста, введите корректное имя (от 2 до 15 символов, только буквы и пробелы).")
+        return
+
+    await state.update_data(name=name)
     user_data = await state.get_data()
+
+    # Продолжение обработки данных
     telegram_id = message.from_user.id
     address = user_data.get("address")
     phone = user_data.get("phone")
-    recipient_name = message.text
+    recipient_name = user_data.get("name")
 
     # Получение user_id из таблицы delivery_customuser
     with sqlite3.connect(DATABASE_PATH) as conn:
@@ -188,12 +212,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
     await message.answer(
         f"Ваш заказ подтверждён!\n\nАдрес: {address}\nТелефон: {phone}\nПолучатель: {recipient_name}\n\nСпасибо за покупку.",
-        reply_markup=types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [types.InlineKeyboardButton(text="Мои заказы", callback_data="my_orders")],
-                [types.InlineKeyboardButton(text="Сделать заказ", callback_data="make_order")]
-            ]
-        )
+        reply_markup=user_main_menu_keyboard()
     )
     await state.clear()
 
