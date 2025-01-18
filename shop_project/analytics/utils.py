@@ -2,27 +2,36 @@ import csv
 from collections import Counter
 from datetime import datetime
 from django.conf import settings
+from delivery.models import Order, OrderProduct, Product
 import os
 
 
 def read_orders_from_csv():
-    file_path = os.path.join(settings.BASE_DIR, 'analytics', 'reports', 'orders.csv')
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Файл {file_path} не найден.")
-
+    """
+    Читает заказы из базы данных и преобразует их в формат, совместимый с предыдущей реализацией.
+    """
     orders = []
-    with open(file_path, mode='r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            # Преобразуем ключи заголовков
-            row = {key.replace(' ', '_'): value for key, value in row.items()}
-            try:
-                # Проверяем корректность поля Date_Created
-                if row.get('Date_Created'):
-                    datetime.strptime(row['Date_Created'], '%Y-%m-%d %H:%M:%S')
-                orders.append(row)
-            except ValueError as e:
-                print(f"Ошибка преобразования строки: {row['Date_Created']} -> {e}")
+
+    # Извлекаем все заказы из базы данных
+    all_orders = Order.objects.prefetch_related('products')
+
+    for order in all_orders:
+        for product in order.products.all():
+            orders.append({
+                'ID': order.id,
+                'User': order.user.username,
+                'Status': order.get_status_display(),
+                'Date_Created': order.date_created.strftime(
+                    '%Y-%m-%d %H:%M:%S') if order.date_created else "Не указано",
+                'Date_Completed': order.completed_date.strftime(
+                    '%Y-%m-%d %H:%M:%S') if order.completed_date else "Не завершён",
+                'Recipient_Name': order.recipient_name,
+                'Phone': order.phone,
+                'Address': order.address,
+                'Category': product.category,
+                'Price': str(product.price),
+            })
+
     return orders
 
 
