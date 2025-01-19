@@ -11,7 +11,7 @@ from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
 from tg_bot.handlers.register import register_all_handlers
 from tg_bot.handlers.controls import check_message_validity, add_active_message, CART_STORAGE
-from keyboards.inline import quantity_keyboard, user_main_menu_keyboard
+from tg_bot.keyboards.inline import quantity_keyboard, user_main_menu_keyboard
 from datetime import datetime
 from tg_bot.keyboards.inline import cart_keyboard
 from tg_bot.services.statuses import translate_status
