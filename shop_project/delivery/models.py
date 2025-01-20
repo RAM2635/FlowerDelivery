@@ -49,6 +49,7 @@ class Order(models.Model):
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status_changed = models.BooleanField(default=False)
     date_created = models.DateTimeField(default=now)
     recipient_name = models.CharField(max_length=255, default="Не указано")  # Имя получателя
     phone = models.CharField(max_length=20, default="Не указано")  # Телефон
@@ -60,8 +61,13 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         # Если статус "Завершён" и дата завершения не установлена
         if self.status == 'completed' and not self.completed_date:
-            # Устанавливаем дату завершения с точностью до секунд
-            self.completed_date = datetime.now().replace(microsecond=0)
+            # Получаем текущее время без микросекунд
+            formatted_date = now().replace(microsecond=0)
+            # Преобразуем обратно в timezone-aware datetime (в данном случае это не обязательно, но полезно для совместимости)
+            self.completed_date = datetime.strptime(
+                formatted_date.strftime('%Y-%m-%d %H:%M:%S'),
+                '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=formatted_date.tzinfo)
         super().save(*args, **kwargs)
 
     class Meta:
