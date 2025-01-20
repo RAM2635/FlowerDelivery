@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.html import mark_safe
 from django.conf import settings
 from django.utils.timezone import now
-
+from datetime import datetime
 
 class CustomUser(AbstractUser):
     # Дополнительные поля для пользователя
@@ -60,7 +60,8 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         # Если статус "Завершён" и дата завершения не установлена
         if self.status == 'completed' and not self.completed_date:
-            self.completed_date = now()
+            # Устанавливаем дату завершения с точностью до секунд
+            self.completed_date = datetime.now().replace(microsecond=0)
         super().save(*args, **kwargs)
 
     class Meta:

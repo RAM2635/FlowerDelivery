@@ -5,7 +5,7 @@
 {% block content %}
     <div class="container my-5">
         <h2 class="text-center">Регистрация</h2>
-        <p class="text-center text-muted">Важно: имя и email используются <br> для регистрации в Telegram-боте.</p>
+        <p class="text-center text-muted">✍️Важно: имя и email используются <br> для регистрации в Telegram-боте.</p>
         <form method="post" class="mt-4 mx-auto" style="max-width: 400px;">
             {% csrf_token %}
             {{ form.as_p }}
