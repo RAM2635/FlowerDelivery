@@ -93,14 +93,25 @@ def user_distribution(request):
     return render(request, 'analytics/user_distribution.html', {'distribution': distribution})
 
 
+def format_time(seconds):
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = int(seconds % 60)
+    return f"{hours} ч {minutes} мин {seconds} сек"
+
 @staff_member_required
 def average_completion_time(request):
     try:
         orders = read_orders_from_csv()
-        avg_time = calculate_average_completion_time(orders)
+        avg_time_seconds = calculate_average_completion_time(orders)
+        avg_time_formatted = format_time(avg_time_seconds)
     except FileNotFoundError as e:
         return render(request, "analytics/error.html", {"message": str(e)})
-    return render(request, 'analytics/average_completion_time.html', {'average_time': avg_time})
+    return render(
+        request,
+        "analytics/average_completion_time.html",
+        {'average_time': avg_time_formatted}
+    )
 
 
 @staff_member_required

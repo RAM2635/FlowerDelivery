@@ -10,5 +10,6 @@
         <a href="{% url 'orders_by_date' %}">Распределение заказов по датам</a>
     </nav>
 
-    <p>Среднее время выполнения заказов (в секундах): <strong>{{ average_time|floatformat:2 }}</strong></p>
+    <p>Среднее время выполнения заказов: <strong>{{ average_time }}</strong></p>
+
 {% endblock %}

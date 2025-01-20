@@ -49,13 +49,13 @@ def calculate_average_completion_time(orders):
     total_time = 0
     count = 0
     for order in orders:
-        if order.get('Date Completed') and order['Date Completed'] != "Не завершён":
+        if order.get('Date_Completed') and order['Date_Completed'] != "Не завершён":
             try:
-                date_created = datetime.strptime(order.get('Date Created', ''), '%Y-%m-%d %H:%M:%S')
-                date_completed = datetime.strptime(order['Date Completed'], '%Y-%m-%d %H:%M:%S')
+                date_created = datetime.strptime(order.get('Date_Created', ''), '%Y-%m-%d %H:%M:%S')
+                date_completed = datetime.strptime(order['Date_Completed'], '%Y-%m-%d %H:%M:%S')
                 total_time += (date_completed - date_created).total_seconds()
                 count += 1
-            except (ValueError, KeyError):
+            except (ValueError, KeyError) as e:
                 continue
     return total_time / count if count > 0 else 0
 
