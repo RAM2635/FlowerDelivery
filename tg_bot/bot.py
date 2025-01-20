@@ -265,9 +265,63 @@ async def view_orders(callback_query: types.CallbackQuery):
         )
     )
 
+# Функция проверки изменений статусов заказов
+async def check_order_status_changes():
+    """
+    Проверяет изменения статусов заказов и отправляет уведомления пользователям.
+    """
+    try:
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+
+            # Получаем заказы с изменённым статусом
+            cursor.execute("""
+                SELECT delivery_order.id, delivery_order.status, delivery_customuser.telegram_id
+                FROM delivery_order
+                JOIN delivery_customuser ON delivery_order.user_id = delivery_customuser.id
+                WHERE delivery_order.status_changed = 1
+            """)
+            orders = cursor.fetchall()
+
+            for order_id, status, telegram_id in orders:
+                if telegram_id:
+                    # Переводим статус
+                    translated_status = translate_status(status)
+
+                    # Отправляем уведомление пользователю
+                    await bot.send_message(
+                        chat_id=telegram_id,
+                        text=f"Ваш заказ #{order_id} теперь имеет статус: {translated_status}."
+                    )
+
+                    # Сбрасываем флаг status_changed
+                    cursor.execute("""
+                        UPDATE delivery_order
+                        SET status_changed = 0
+                        WHERE id = ?
+                    """, (order_id,))
+                    conn.commit()
+
+    except Exception as e:
+        print(f"Ошибка проверки изменений статусов заказов: {e}")
+
+
+# Периодическая проверка статусов
+async def periodic_status_check(interval=30):
+    """
+    Периодически запускает проверку статусов заказов.
+    """
+    while True:
+        await check_order_status_changes()
+        await asyncio.sleep(interval)
+
 
 # Запуск бота
 async def main():
+    # Запуск периодической проверки статусов заказов
+    asyncio.create_task(periodic_status_check(interval=5))
+
+    # Запуск обработчиков бота
     await dp.start_polling(bot)
 
 

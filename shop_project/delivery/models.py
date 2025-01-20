@@ -59,15 +59,20 @@ class Order(models.Model):
     products = models.ManyToManyField('Product', through='OrderProduct')
 
     def save(self, *args, **kwargs):
+        # Проверяем, изменился ли статус
+        if self.pk:  # Только для уже существующих объектов
+            original_status = Order.objects.get(pk=self.pk).status
+            if original_status != self.status:
+                self.status_changed = True  # Устанавливаем статус изменения
+
         # Если статус "Завершён" и дата завершения не установлена
         if self.status == 'completed' and not self.completed_date:
-            # Получаем текущее время без микросекунд
             formatted_date = now().replace(microsecond=0)
-            # Преобразуем обратно в timezone-aware datetime (в данном случае это не обязательно, но полезно для совместимости)
             self.completed_date = datetime.strptime(
                 formatted_date.strftime('%Y-%m-%d %H:%M:%S'),
                 '%Y-%m-%d %H:%M:%S'
             ).replace(tzinfo=formatted_date.tzinfo)
+
         super().save(*args, **kwargs)
 
     class Meta:
