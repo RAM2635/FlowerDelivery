@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from datetime import datetime
 from unittest.mock import AsyncMock
 from tg_bot.handlers.start import start_handler, exit_handler
-from tg_bot.keyboards.inline import user_main_menu_keyboard, admin_main_menu_keyboard
+
 
 
 @pytest.mark.asyncio

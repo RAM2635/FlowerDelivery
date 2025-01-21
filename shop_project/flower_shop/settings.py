@@ -69,14 +69,12 @@ CSP_SCRIPT_SRC = (
     "https://cdn.jsdelivr.net",  # Bootstrap JS
 )
 
-
 ROOT_URLCONF = 'flower_shop.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        # Убедитесь, что этот путь добавлен  # Здесь можно оставить пустым, если все шаблоны находятся в приложениях
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,7 +128,6 @@ LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Europe/Moscow'
 
-
 USE_I18N = True
 
 USE_TZ = True
@@ -150,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/login/'  # Страница входа
 LOGIN_REDIRECT_URL = '/catalog/cart/'
-# Перенаправление после входа
+
 
 
 MEDIA_URL = '/media/'

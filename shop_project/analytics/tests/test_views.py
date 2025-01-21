@@ -1,5 +1,5 @@
 from django.test import TestCase
-from delivery.models import CustomUser  # Используем CustomUser вместо User
+from delivery.models import CustomUser
 
 class AnalyticsViewsTestCase(TestCase):
     def setUp(self):

@@ -1,20 +1,8 @@
-import pytest
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from tg_bot.keyboards.inline import (
     main_menu_keyboard,
     back_button_keyboard,
     product_keyboard,
-    cart_keyboard,
-    quantity_keyboard,
-    disable_keyboard,
-    cart_actions_keyboard,
-    admin_order_keyboard,
-    back_to_admin_menu_keyboard,
-    user_main_menu_keyboard,
-    admin_main_menu_keyboard,
-    dynamic_main_menu_keyboard,
-    analytics_menu_keyboard,
-    analytics_back_keyboard,
 )
 
 

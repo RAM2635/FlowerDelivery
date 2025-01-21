@@ -11,7 +11,6 @@ from tg_bot.keyboards.inline import cart_actions_keyboard
 from tg_bot.services.statuses import translate_status
 from tg_bot.services.database import is_admin
 
-
 # Локальное хранилище корзин пользователей
 CART_STORAGE = {}
 
@@ -75,12 +74,8 @@ async def back_to_main(callback_query: CallbackQuery, bot: Bot):
                     )
                     message_info['keyboard_active'] = False
                 updated_messages.append(message_info)
-            except TelegramBadRequest as e:
-                if "message to edit not found" in str(e):
-                    print(f"Сообщение {message_id} не найдено, пропускаем.")
-                else:
-                    print(f"Ошибка отключения клавиатуры для сообщения {message_id}: {e}")
-
+            except TelegramBadRequest:
+                pass
         active_messages[user_id] = updated_messages
 
     # Проверяем, является ли пользователь администратором
@@ -178,19 +173,15 @@ async def view_cart(callback_query: types.CallbackQuery):
                     )
                     message_info['keyboard_active'] = False
                 updated_messages.append(message_info)
-            except TelegramBadRequest as e:
-                if "message to edit not found" in str(e):
-                    print(f"Сообщение {message_id} не найдено, пропускаем.")
-                else:
-                    print(f"Ошибка отключения клавиатуры для сообщения {message_id}: {e}")
-
+            except TelegramBadRequest:
+                pass
         active_messages[user_id] = updated_messages
 
     # Удаляем старое сообщение корзины (если возможно)
     try:
         await callback_query.message.delete()
-    except Exception as e:
-        print(f"Ошибка удаления сообщения: {e}")
+    except Exception:
+        pass
 
     # Если корзина пуста
     if not cart:
@@ -203,8 +194,8 @@ async def view_cart(callback_query: types.CallbackQuery):
             if user_id not in active_messages:
                 active_messages[user_id] = []
             active_messages[user_id].append({'message_id': new_message.message_id, 'keyboard_active': True})
-        except Exception as e:
-            await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
+        except Exception:
+            pass
         return
 
     # Формируем текст корзины
@@ -227,6 +218,7 @@ async def view_cart(callback_query: types.CallbackQuery):
         active_messages[user_id].append({'message_id': new_message.message_id, 'keyboard_active': True})
     except Exception as e:
         await callback_query.answer(f"Ошибка обновления корзины: {str(e)}", show_alert=True)
+
 
 # Обработчик: Удаление товара из корзины
 async def remove_item(callback_query: types.CallbackQuery):
@@ -277,16 +269,11 @@ async def check_message_validity(callback_query: CallbackQuery) -> bool:
     user_id = callback_query.from_user.id
     message_id = callback_query.message.message_id
 
-    # Лог для отладки
-    # print(f"Проверка валидности сообщения: {message_id} для пользователя {user_id}")
-
     # Проверяем наличие активных сообщений для пользователя
     if user_id not in active_messages or not any(
             isinstance(msg, dict) and msg.get('message_id') == message_id
             for msg in active_messages[user_id]
     ):
-        print(f"Сообщение {message_id} устарело для пользователя {user_id}")
-
         # Обновляем текст для пользователя, если сообщение устарело
         await callback_query.message.edit_text(
             "Сообщение устарело. Пожалуйста, обновите экран.",
@@ -296,7 +283,6 @@ async def check_message_validity(callback_query: CallbackQuery) -> bool:
         )
         return False
 
-    print(f"Сообщение {message_id} актуально для пользователя {user_id}")
     return True
 
 

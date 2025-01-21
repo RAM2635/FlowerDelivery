@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.views import LogoutView
 from .forms import CustomUserCreationForm
 from django.contrib.auth import login
 

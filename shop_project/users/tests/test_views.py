@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class UserViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -31,6 +32,7 @@ class UserViewsTest(TestCase):
 
         self.assertEqual(response.status_code, 302)  # Ожидается редирект
         self.assertTrue(User.objects.filter(username='testuser').exists())
+
     def test_login_view(self):
         User.objects.create_user(username='testuser', password='securePassword123')
         response = self.client.post(self.login_url, {'username': 'testuser', 'password': 'securePassword123'})

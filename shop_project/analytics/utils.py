@@ -1,9 +1,6 @@
-import csv
 from collections import Counter
 from datetime import datetime
-from django.conf import settings
-from delivery.models import Order, OrderProduct, Product
-import os
+from delivery.models import Order
 
 
 def read_orders_from_csv():
@@ -76,7 +73,3 @@ def count_orders_by_date(orders):
             date_counts[date] = date_counts.get(date, 0) + 1
 
     return date_counts
-
-
-
-

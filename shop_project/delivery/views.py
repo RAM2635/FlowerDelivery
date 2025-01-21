@@ -1,10 +1,13 @@
-from .models import Order, Cart, Product, Review
 from django.conf import settings
-from django.utils.timezone import now
-from .forms import CheckoutForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.db import transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import now
+
+from .models import Order, Cart, Product, Review
+from .forms import CheckoutForm
+
 
 
 @login_required
@@ -139,9 +142,6 @@ def order_detail(request, order_id):
     return render(request, 'users/order_detail.html', {'order': order, 'products': products})
 
 
-from django.db import transaction
-
-
 @login_required
 @transaction.atomic
 def repeat_order(request, order_id):
@@ -175,9 +175,6 @@ def product_reviews(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     reviews = product.reviews.all()
     return render(request, 'delivery/product_reviews.html', {'product': product, 'reviews': reviews})
-
-
-from django.shortcuts import render, get_object_or_404
 
 
 def product_detail(request, product_id):

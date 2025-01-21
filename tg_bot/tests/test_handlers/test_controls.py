@@ -1,4 +1,3 @@
-import pytest
 from tg_bot.handlers.controls import add_active_message
 
 
