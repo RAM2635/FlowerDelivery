@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.timezone import now
 from datetime import datetime
 
+
 class CustomUser(AbstractUser):
     # Дополнительные поля для пользователя
     email = models.EmailField(unique=True, blank=False, null=False)
@@ -59,11 +60,19 @@ class Order(models.Model):
     products = models.ManyToManyField('Product', through='OrderProduct')
 
     def save(self, *args, **kwargs):
+        # Убираем миллисекунды из date_created
+        if not self.pk:  # Только при создании объекта
+            formatted_date = now().replace(microsecond=0)
+            self.date_created = datetime.strptime(
+                formatted_date.strftime('%Y-%m-%d %H:%M:%S'),
+                '%Y-%m-%d %H:%M:%S'
+            ).replace(tzinfo=formatted_date.tzinfo)
+
         # Проверяем, изменился ли статус
-        if self.pk:  # Только для уже существующих объектов
+        if self.pk:
             original_status = Order.objects.get(pk=self.pk).status
             if original_status != self.status:
-                self.status_changed = True  # Устанавливаем статус изменения
+                self.status_changed = True
 
         # Если статус "Завершён" и дата завершения не установлена
         if self.status == 'completed' and not self.completed_date:
