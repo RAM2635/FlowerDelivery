@@ -105,48 +105,52 @@ async def add_to_cart_callback(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     data = callback_query.data.split("_")
 
-    # Проверка формата callback_data
+    # Проверяем формат данных
     if len(data) < 4 or data[0] != "add" or data[1] != "to" or data[2] != "cart":
         await callback_query.answer("Некорректные данные callback!", show_alert=True)
         return
 
     try:
-        product_id = int(data[3])  # Здесь должно быть product_id
-        quantity = int(data[4])  # Здесь должно быть quantity
+        product_id = int(data[3])  # ID товара
+        quantity = int(data[4])  # Выбранное количество
     except (ValueError, IndexError):
         await callback_query.answer("Ошибка данных!", show_alert=True)
         return
 
-    # Получаем данные о товаре из базы данных
+    # Получаем данные о товаре
     with sqlite3.connect(DATABASE_PATH) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT name, price FROM delivery_product WHERE id=?", (product_id,))
+        cursor.execute("SELECT name, price, balance FROM delivery_product WHERE id=?", (product_id,))
         product = cursor.fetchone()
 
     if not product:
         await callback_query.answer("Товар не найден!", show_alert=True)
         return
 
-    product_name, price = product
+    product_name, price, balance = product
 
-    # Инициализация корзины для пользователя, если её нет
+    # ❗ Проверяем, хватает ли товара на складе
+    if quantity > balance:
+        await callback_query.answer(f"❌ Недостаточно товара! Доступно: {balance}.", show_alert=True)
+        return
+
+    # Добавляем товар в корзину
     if user_id not in CART_STORAGE:
         CART_STORAGE[user_id] = []
 
-    # Проверяем, есть ли уже товар в корзине
     for item in CART_STORAGE[user_id]:
         if item["product_id"] == product_id:
-            item["quantity"] += quantity  # Увеличиваем на выбранное количество
+            item["quantity"] += quantity
             break
     else:
         CART_STORAGE[user_id].append({
             "product_id": product_id,
             "product_name": product_name,
             "price": price,
-            "quantity": quantity  # Устанавливаем выбранное количество
+            "quantity": quantity
         })
 
-    await callback_query.answer(f"Товар '{product_name}' добавлен в корзину!")
+    await callback_query.answer(f"✅ Товар '{product_name}' добавлен в корзину!")
 
 
 async def view_cart(callback_query: types.CallbackQuery):

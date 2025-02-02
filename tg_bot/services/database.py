@@ -10,6 +10,7 @@ load_dotenv()
 DATABASE_PATH = os.getenv("DATABASE_PATH")
 ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID")
 
+
 def get_user_by_telegram_id(telegram_id):
     """
     Получить данные пользователя по Telegram ID.
@@ -53,6 +54,7 @@ def is_admin(telegram_id):
     """
     return str(telegram_id) == ADMIN_TELEGRAM_ID
 
+
 def update_order_status(order_id, new_status, admin_telegram_id, database_path):
     """
     Обновить статус заказа.
@@ -68,7 +70,21 @@ def update_order_status(order_id, new_status, admin_telegram_id, database_path):
     with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
 
-        # Обновить статус и дату завершения заказа, если необходимо
+        # Если заказ отменён, вернуть balance товаров
+        if new_status == "cancelled":
+            cursor.execute(
+                "SELECT product_id, quantity FROM delivery_orderproduct WHERE order_id = ?",
+                (order_id,)
+            )
+            products = cursor.fetchall()
+
+            for product_id, quantity in products:
+                cursor.execute(
+                    "UPDATE delivery_product SET balance = balance + ? WHERE id = ?",
+                    (quantity, product_id)
+                )
+
+        # Обновляем статус заказа
         cursor.execute(
             "UPDATE delivery_order SET status=?, completed_date=? WHERE id=?",
             (
@@ -80,13 +96,10 @@ def update_order_status(order_id, new_status, admin_telegram_id, database_path):
 
         conn.commit()
 
-        # Получить Telegram ID пользователя для уведомления
+        # Получаем Telegram ID пользователя
         cursor.execute(
             "SELECT c.telegram_id FROM delivery_order o JOIN delivery_customuser c ON o.user_id = c.id WHERE o.id = ?",
             (order_id,)
         )
         result = cursor.fetchone()
-        if result:
-            return result[0]  # Возвращаем Telegram ID пользователя
-
-        return None
+        return result[0] if result else None

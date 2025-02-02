@@ -169,37 +169,51 @@ async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(name=name)
     user_data = await state.get_data()
 
-    # Продолжение обработки данных
     telegram_id = message.from_user.id
     address = user_data.get("address")
     phone = user_data.get("phone")
     recipient_name = user_data.get("name")
 
-    # Получение user_id из таблицы delivery_customuser
+    # Получаем user_id из базы
     with sqlite3.connect(DATABASE_PATH) as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT id FROM delivery_customuser WHERE telegram_id = ?",
-            (telegram_id,)
-        )
+        cursor.execute("SELECT id FROM delivery_customuser WHERE telegram_id = ?", (telegram_id,))
         result = cursor.fetchone()
+
         if result is None:
             await message.answer("Ошибка: пользователь не найден в базе данных.")
             return
 
         user_id = result[0]
 
-        # Добавляем заказ с текущей датой
         date_created = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        status_changed = 0  # ✅ Устанавливаем начальное значение
+
         cursor.execute(
-            "INSERT INTO delivery_order (user_id, address, phone, recipient_name, status, date_created) VALUES (?, ?, ?, ?, ?, ?)",
-            (user_id, address, phone, recipient_name, "pending", date_created)
+            """INSERT INTO delivery_order (user_id, address, phone, recipient_name, status, date_created, status_changed) 
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (user_id, address, phone, recipient_name, "pending", date_created, 0)
+            # ⬅ Устанавливаем `status_changed = 0`
         )
+
         order_id = cursor.lastrowid
 
-        # Добавляем товары заказа
+        # Проверяем остатки и уменьшаем `balance`
         cart = CART_STORAGE.get(telegram_id, [])
         for item in cart:
+            cursor.execute("SELECT balance FROM delivery_product WHERE id=?", (item["product_id"],))
+            product_balance = cursor.fetchone()[0]
+
+            if item["quantity"] > product_balance:
+                await message.answer(f"❌ Недостаточно товара '{item['product_name']}'! Доступно: {product_balance}.")
+                return
+
+            # Уменьшаем баланс товара
+            cursor.execute(
+                "UPDATE delivery_product SET balance = balance - ? WHERE id = ?",
+                (item["quantity"], item["product_id"])
+            )
+
             cursor.execute(
                 "INSERT INTO delivery_orderproduct (order_id, product_id, quantity) VALUES (?, ?, ?)",
                 (order_id, item["product_id"], item["quantity"])
@@ -211,7 +225,7 @@ async def process_name(message: types.Message, state: FSMContext):
     CART_STORAGE[telegram_id] = []
 
     await message.answer(
-        f"Ваш заказ подтверждён!\n\nАдрес: {address}\nТелефон: {phone}\nПолучатель: {recipient_name}\n\nСпасибо за покупку.",
+        f"✅ Ваш заказ подтверждён!\n\nАдрес: {address}\nТелефон: {phone}\nПолучатель: {recipient_name}\n\nСпасибо за покупку!",
         reply_markup=user_main_menu_keyboard()
     )
     await state.clear()
@@ -264,6 +278,7 @@ async def view_orders(callback_query: types.CallbackQuery):
             inline_keyboard=[[types.InlineKeyboardButton(text="Назад", callback_data="main_menu")]]
         )
     )
+
 
 # Функция проверки изменений статусов заказов
 async def check_order_status_changes():
