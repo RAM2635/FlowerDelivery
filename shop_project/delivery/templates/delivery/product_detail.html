@@ -7,8 +7,7 @@
         <h1>{{ product.name }}</h1>
         <p>{{ product.description }}</p>
         <p><strong>Цена:</strong> {{ product.price }} ₽</p>
-        <p><strong>Количество в наличии:</strong> {{ product.quantity }}</p>
-
+        <p><strong>Доступно для заказа:</strong> {{ product.balance }}</p>
         <h2 class="mt-4">Отзывы</h2>
         {% if reviews %}
             <ul class="list-group mt-4">

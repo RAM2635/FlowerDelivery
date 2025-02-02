@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'analytics',
     'delivery',
+    'delivery.templatetags.custom_filters',  # Добавляем принудительно
     'users',  # Новое приложение для работы с пользователями
 ]
 
@@ -147,8 +148,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/login/'  # Страница входа
 LOGIN_REDIRECT_URL = '/catalog/cart/'
-
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

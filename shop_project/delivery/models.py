@@ -22,6 +22,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
+    balance = models.PositiveIntegerField(default=0)  # Поле для остатка товара
     category = models.CharField(max_length=100)  # Поле для категории
     image = models.ImageField(upload_to='products/', blank=True, null=True)  # Поле для изображения
 
@@ -32,6 +33,12 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        # Если товар создаётся впервые, устанавливаем balance = quantity
+        if not self.pk:
+            self.balance = self.quantity
+        super().save(*args, **kwargs)
+
     # Метод для отображения изображения в админке
     def image_tag(self):
         if self.image:
@@ -39,7 +46,6 @@ class Product(models.Model):
         return "Нет изображения"
 
     image_tag.short_description = 'Изображение'  # Подпись для поля в админке
-
 
 class Order(models.Model):
     STATUS_CHOICES = [

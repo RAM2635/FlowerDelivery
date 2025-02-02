@@ -70,7 +70,8 @@ class OrderProductAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'quantity', 'category', 'image_tag')
+    list_display = ('name', 'price', 'quantity', 'balance', 'category', 'image_tag')  # Добавили balance
+    list_editable = ('balance',)  # Позволяет редактировать баланс в админке
     list_filter = ('category',)
     search_fields = ('name', 'description')
     readonly_fields = ('image_tag',)

@@ -22,11 +22,16 @@
                 <tbody>
                 {% for item in cart_items %}
                     <tr>
-                        <td>{{ item.product.name }}</td>
                         <td>
+                            {{ item.product.name }} <br>
+                            <small class="text-muted">Осталось: {{ item.product.balance }}</small>
+                        </td>
+                        <td>
+                            <!-- Форма для обновления количества -->
                             <form method="post" action="{% url 'cart_update' item.product.id %}" class="d-flex">
                                 {% csrf_token %}
-                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 70px;">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                       class="form-control form-control-sm me-2" style="width: 70px;">
                                 <button type="submit" class="btn btn-sm btn-primary">Обновить</button>
                             </form>
                         </td>
@@ -36,13 +41,30 @@
                             <a href="{% url 'cart_remove' item.product.id %}" class="btn btn-sm btn-danger">Удалить</a>
                         </td>
                     </tr>
+                    {% if item.quantity > item.product.balance %}
+                        <tr>
+                            <td colspan="5">
+                                <p class="text-danger text-center">
+                                    ❌ Недостаточно товара "{{ item.product.name }}".<br>
+                                    Доступно: {{ item.product.balance }}, В корзине: {{ item.quantity }}
+                                </p>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
             </table>
+
             <div class="text-end mt-3">
                 <h5>Общая сумма: {{ total_price }}</h5>
-                <a href="{% url 'checkout' %}" class="btn btn-primary">Перейти к оформлению</a>
-                <a href="{% url 'checkout' %}" class="btn btn-success w-100 mt-3">Оформить заказ</a>
+                {% if cart_updated %}
+                    <a href="{% url 'checkout' %}" class="btn btn-success mt-3">Перейти к оформлению</a>
+                {% else %}
+                    <a href="#" class="btn btn-success mt-3 disabled"
+                       title="Нажмите 'Обновить', чтобы сохранить изменения">
+                        Перейти к оформлению
+                    </a>
+                {% endif %}
             </div>
 
         {% else %}
