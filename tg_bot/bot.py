@@ -49,13 +49,13 @@ async def make_order(callback_query: types.CallbackQuery):
 
     with sqlite3.connect(DATABASE_PATH) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, price, image FROM delivery_product")
+        cursor.execute("SELECT id, name, price, image, balance FROM delivery_product")
         products = cursor.fetchall()
 
     if products:
         await callback_query.message.delete()
         for product in products:
-            product_id, name, price, image_path = product
+            product_id, name, price, image_path, balance = product
             file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../shop_project/media", image_path))
 
             if os.path.exists(file_path):
@@ -63,7 +63,7 @@ async def make_order(callback_query: types.CallbackQuery):
                 new_message = await bot.send_photo(
                     chat_id=user_id,
                     photo=photo,
-                    caption=f"{name}\nЦена: {price} руб.",
+                    caption=f"{name}\nЦена: {price} руб.\nВ наличии: {balance} шт.",
                     reply_markup=quantity_keyboard(product_id, 1)
                 )
                 add_active_message(user_id, new_message.message_id)  # Добавляем новое сообщение в active_messages
